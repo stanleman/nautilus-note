@@ -60,27 +60,26 @@ export default function Landing() {
   };
 
   return (
-    <div className=" grid grid-cols-2 h-screen  bg-gradient-to-b from-[#73C8A9] to-[#373B44]">
-      <div className="h-full w-full">
-        <h2 className="capitalize">Landing page</h2>
+    <div className=" flex md:flex-row flex-col h-screen bg-gradient-to-r from-[#136a8a] to-[#267871]">
+      <div className="h-full md:w-[50%] w-full flex flex-col justify-center md:items-start items-center md:text-start text-center gap-2 p-[80px]">
+        <h1 className="text-xl sm:text-2xl md:text-4xl font-semibold">
+          Introducing <span className="font-bold">Nautilus Note</span>
+        </h1>
+
+        <p className="text-sm sm:text-md md:text-xl">
+          The number one tool in a student's arsenal to maximise productivity.
+        </p>
 
         <button
           onClick={signInWithGoogle}
-          className=" bg-white hover:bg-neutral-200 text-black  py-3 px-5 rounded-full text-sm flex gap-2 items-center hover:scale-105 duration-75"
+          className=" bg-white  text-black hover:text-[#90E4C1]  py-3 px-5 rounded-full text-sm flex gap-2 items-center hover:scale-105 duration-75"
         >
-          Get started
+          Get productive now
         </button>
       </div>
 
-      <div className="h-full w-full">
-        <h2 className="capitalize">Landing page</h2>
-
-        <button
-          onClick={signInWithGoogle}
-          className=" bg-white hover:bg-neutral-200 text-black  py-3 px-5 rounded-full text-sm flex gap-2 items-center hover:scale-105 duration-75"
-        >
-          Get started
-        </button>
+      <div className="h-full md:w-[50%] w-full flex justify-center items-center md:bg-none bg-gradient-to-r from-[#136a8a] to-[#267871]">
+        <Image src="/trello.png" width={550} height={550} alt="landing image" />
       </div>
     </div>
   );
