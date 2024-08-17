@@ -60,15 +60,28 @@ export default function Landing() {
   };
 
   return (
-    <div>
-      <h2 className="capitalize">Landing page</h2>
-      <button
-        onClick={signInWithGoogle}
-        className="w-48 bg-white hover:bg-neutral-200 text-black border-black border py-2 px-3 rounded text-sm flex gap-2 items-center hover:scale-105 duration-75"
-      >
-        <Image src="/google.png" width={17} height={17} alt="Google" />
-        Sign in with Google
-      </button>
+    <div className=" grid grid-cols-2 h-screen  bg-gradient-to-b from-[#73C8A9] to-[#373B44]">
+      <div className="h-full w-full">
+        <h2 className="capitalize">Landing page</h2>
+
+        <button
+          onClick={signInWithGoogle}
+          className=" bg-white hover:bg-neutral-200 text-black  py-3 px-5 rounded-full text-sm flex gap-2 items-center hover:scale-105 duration-75"
+        >
+          Get started
+        </button>
+      </div>
+
+      <div className="h-full w-full">
+        <h2 className="capitalize">Landing page</h2>
+
+        <button
+          onClick={signInWithGoogle}
+          className=" bg-white hover:bg-neutral-200 text-black  py-3 px-5 rounded-full text-sm flex gap-2 items-center hover:scale-105 duration-75"
+        >
+          Get started
+        </button>
+      </div>
     </div>
   );
 }

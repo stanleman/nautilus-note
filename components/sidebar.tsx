@@ -47,6 +47,7 @@ export default function Sidebar() {
         setLoading(false);
       } else {
         setUser(null);
+        setLoading(false);
       }
     });
     return () => userCheck();
@@ -66,7 +67,7 @@ export default function Sidebar() {
   if (loading) {
     console.log("im loading");
     return (
-      <div className="h-screen flex flex-col justify-center items-center">
+      <div className="h-screen w-full absolute flex flex-col bg-[#020817] justify-center items-center !z-[9999]">
         <h1 className="text-white text-xl font-semibold mb-3">Loading...</h1>
         <BarLoader color="#90E4C1" />
       </div>

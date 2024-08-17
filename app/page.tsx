@@ -60,7 +60,7 @@ export default function Home() {
   };
 
   return (
-    <div className="flex flex-col h-screen">
+    <div className="flex flex-col h-screen sm:ml-[300px] mx-5 sm:mt-3 mt-16">
       {user ? (
         <>
           <h1>Hello, {user.displayName}</h1>

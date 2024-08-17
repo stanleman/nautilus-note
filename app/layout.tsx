@@ -18,9 +18,7 @@ export default function RootLayout({
     <html lang="en" className="dark bg-[#020817]">
       <body className={libreFranklin.className}>
         <Sidebar />
-        <main className="sm:ml-[300px] mx-5 sm:mt-3 mt-16 h-screen ">
-          {children}
-        </main>
+        <main>{children}</main>
       </body>
     </html>
   );
