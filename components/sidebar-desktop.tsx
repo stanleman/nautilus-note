@@ -48,6 +48,7 @@ export default function SidebarDesktop(props: SidebarDesktopProps) {
       }
     }
   };
+  console.log(user?.photoURL);
 
   return (
     <aside className="w-[270px] max-w-xs h-screen fixed left-0 top-0 z-40 border-r">

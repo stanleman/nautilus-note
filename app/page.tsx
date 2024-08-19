@@ -61,21 +61,7 @@ export default function Home() {
 
   return (
     <div className="flex flex-col h-screen sm:ml-[300px] mx-5 sm:mt-3 mt-16">
-      {user ? (
-        <>
-          <h1>Hello, {user.displayName}</h1>
-        </>
-      ) : (
-        <>
-          <button
-            onClick={signInWithGoogle}
-            className="w-48 bg-white hover:bg-neutral-200 text-black border-black border py-2 px-3 rounded text-sm flex gap-2 items-center hover:scale-105 duration-75"
-          >
-            <Image src="/google.png" width={17} height={17} alt="Google" />
-            Sign in with Google
-          </button>
-        </>
-      )}
+      <h1>Hello, {user?.displayName}</h1>
     </div>
   );
 }

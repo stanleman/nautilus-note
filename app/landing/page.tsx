@@ -72,7 +72,7 @@ export default function Landing() {
 
         <button
           onClick={signInWithGoogle}
-          className=" bg-white  text-black hover:text-[#90E4C1]  py-3 px-5 rounded-full text-sm flex gap-2 items-center hover:scale-105 duration-75"
+          className=" bg-white  text-black hover:text-[#90E4C1] hover:font-bold  py-3 px-5 rounded-full text-sm flex gap-2 items-center hover:scale-105 duration-75"
         >
           Get productive now
         </button>

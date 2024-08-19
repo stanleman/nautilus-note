@@ -105,7 +105,6 @@ export function SidebarMobile(props: SidebarMobileProps) {
                           className="rounded-full"
                           src={user?.photoURL ?? undefined}
                         />
-                        {/* <AvatarFallback>{user?.displayName}</AvatarFallback> */}
                       </Avatar>
 
                       <div className="flex flex-col items-start">
