@@ -81,7 +81,7 @@ export default function SidebarDesktop(props: SidebarDesktopProps) {
                       <Avatar className="h-9 w-9 ">
                         <AvatarImage
                           className="rounded-full"
-                          src={user?.photoURL ?? undefined}
+                          src={`${user?.photoURL}`}
                         />
                       </Avatar>
 
