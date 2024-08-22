@@ -48,6 +48,7 @@ export default function SidebarDesktop(props: SidebarDesktopProps) {
       }
     }
   };
+
   console.log(user?.photoURL);
 
   return (

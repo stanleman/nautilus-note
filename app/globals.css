@@ -18,6 +18,10 @@
   box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
 }
 
+.list-container {
+  align-items: flex-start;
+}
+
 @layer base {
   :root {
     --background: 0 0% 100%;

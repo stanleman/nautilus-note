@@ -4,12 +4,8 @@ import { useEffect, useState } from "react";
 import app from "@/config.js";
 import {
   getFirestore,
-  doc,
-  getDoc,
-  setDoc,
   addDoc,
   collection,
-  getDocs,
   onSnapshot,
   QuerySnapshot,
   DocumentData,
@@ -29,6 +25,8 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Toaster, toast } from "sonner";
 import { getAuth, User } from "firebase/auth";
+import { useRouter } from "next/navigation";
+import EditBoard from "./editBoard";
 
 export default function Boards() {
   const db = getFirestore(app);
@@ -39,6 +37,7 @@ export default function Boards() {
   const [boardsData, setBoardsData]: Array<any> = useState();
   const auth = getAuth(app);
   const [user, setUser] = useState<User | null>(null);
+  const router = useRouter();
 
   useEffect(() => {
     const userCheck = auth.onAuthStateChanged((user) => {
@@ -73,7 +72,7 @@ export default function Boards() {
     toast.success("Board added successfully");
   };
 
-  useEffect(() => {
+  const fetchBoards = async () => {
     if (user) {
       const boardsRef = collection(db, "boards");
 
@@ -93,13 +92,17 @@ export default function Boards() {
 
       return () => unsubscribe();
     }
+  };
+
+  useEffect(() => {
+    fetchBoards();
   }, [user]);
 
   return (
     <div className="sm:ml-[300px] mx-5 sm:mt-3 mt-16 ">
       <AlertDialog>
         <div className="flex items-center gap-5">
-          <h2 className="font-bold text-2xl">Boards name</h2>
+          <h2 className="font-bold text-2xl">Your Boards </h2>
           <AlertDialogTrigger className="bg-[#90E4C1] text-primary-foreground hover:bg-[#90E4C1]/90 px-4 py-[10px] rounded-md text-sm">
             Add new board +
           </AlertDialogTrigger>
@@ -121,11 +124,12 @@ export default function Boards() {
                   />
 
                   <select
+                    required
                     name="color"
                     onChange={boardOnChangeHandler}
-                    className="mt-3 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                    className="mt-3 bg-gray-50 border border-gray-300  text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                   >
-                    <option selected disabled>
+                    <option selected disabled className="text-gray-500">
                       Select a color
                     </option>
                     <option value="bg-red-500">Red</option>
@@ -139,9 +143,7 @@ export default function Boards() {
 
                 <div className="flex gap-1">
                   <AlertDialogCancel>Cancel</AlertDialogCancel>
-                  <AlertDialogAction>
-                    <button type="submit">Submit</button>
-                  </AlertDialogAction>
+                  <AlertDialogAction type="submit">Submit</AlertDialogAction>
                 </div>
               </form>
             </AlertDialogDescription>
@@ -156,7 +158,9 @@ export default function Boards() {
         <div className="flex flex-wrap gap-3 mt-5">
           {boardsData?.map((boardData: any) => (
             <div
-              className={`${boardData.color} w-fit px-[70px] py-[50px] hover:scale-105 duration-200`}
+              className={`${boardData.color} w-fit px-[70px] py-[50px] hover:scale-105 hover:cursor-pointer duration-200`}
+              onClick={() => router.push(`/boards/${boardData.id}`)}
+              key={boardData.id}
             >
               <p className="text-black">{boardData.name}</p>
             </div>
