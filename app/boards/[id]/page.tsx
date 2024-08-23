@@ -29,12 +29,12 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Toaster, toast } from "sonner";
 import BarLoader from "react-spinners/BarLoader";
-import { Ellipsis, Trash2 } from "lucide-react";
+import { GripHorizontal, Trash2 } from "lucide-react";
 import Card from "./card";
 import EditList from "./editList";
 import EditBoard from "../editBoard";
 import DeleteList from "./deleteList";
-import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
+import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 
 export default function BoardItem({ params }: { params: { id: string } }) {
   const router = useRouter();
@@ -53,8 +53,6 @@ export default function BoardItem({ params }: { params: { id: string } }) {
   const [listDataError, setListDataError] = useState<string | null>(null);
 
   const [refresh, setRefresh] = useState(false);
-
-  console.log("id is", params.id);
 
   const [card, setCard] = useState({
     name: "",
@@ -236,202 +234,239 @@ export default function BoardItem({ params }: { params: { id: string } }) {
     toast.success("Card added successfully");
   };
 
+  const onDragEnd = (result: any) => {
+    console.log(result);
+
+    // get card info
+    // set new listId of said card following the destination draggableId
+    // profit
+
+    // figure out how to store the index
+  };
+
   return (
-    <div>
-      <div className="w-full flex justify-end mt-4 mb-0 sm:hidden ">
-        <Button
-          className="bg-transparent text-neutral-300 hover:bg-slate-600/30"
-          onClick={() => router.push("/boards")}
-        >
-          Return to boards page →
-        </Button>
-      </div>
-      <div className="sm:ml-[300px] mx-5 sm:mt-3 mt-3">
-        {boardsData && (
-          <div>
-            <AlertDialog>
-              <div className="flex items-center justify-between gap-5">
-                <div className="flex gap-4 items-center">
-                  <EditBoard
-                    boardId={params.id}
-                    userId={user?.uid as string}
-                    boardName={boardsData.name}
-                    boardColor={boardsData.color}
-                    onBoardEdited={fetchBoards}
-                  />
+    <DragDropContext onDragEnd={onDragEnd}>
+      <div>
+        <div className="w-full flex justify-end mt-4 mb-0 sm:hidden ">
+          <Button
+            className="bg-transparent text-neutral-300 hover:bg-slate-600/30"
+            onClick={() => router.push("/boards")}
+          >
+            Return to boards page →
+          </Button>
+        </div>
+        <div className="sm:ml-[300px] mx-5 sm:mt-3 mt-3">
+          {boardsData && (
+            <div>
+              <AlertDialog>
+                <div className="flex items-center justify-between gap-5">
+                  <div className="flex gap-4 items-center">
+                    <EditBoard
+                      boardId={params.id}
+                      userId={user?.uid as string}
+                      boardName={boardsData.name}
+                      boardColor={boardsData.color}
+                      onBoardEdited={fetchBoards}
+                    />
 
-                  <div className="flex gap-2">
-                    <AlertDialogTrigger className="bg-[#90E4C1] text-primary-foreground hover:bg-[#90E4C1]/90 px-4 py-[10px] rounded-md text-sm flex">
-                      <span className="min-[900px]:flex hidden">
-                        Add new list
-                      </span>
-                      +
-                    </AlertDialogTrigger>
-
-                    <AlertDialog>
-                      <AlertDialogTrigger className="text-white px-4 py-[10px] rounded-md text-sm bg-red-500 hover:bg-red-900 flex items-center gap-1">
+                    <div className="flex gap-2">
+                      <AlertDialogTrigger className="bg-[#90E4C1] text-primary-foreground hover:bg-[#90E4C1]/90 px-4 py-[10px] rounded-md text-sm flex">
                         <span className="min-[900px]:flex hidden">
-                          Delete board
+                          Add new list
                         </span>
-                        <Trash2 size={15} />
+                        +
                       </AlertDialogTrigger>
 
-                      <AlertDialogContent>
-                        <AlertDialogHeader>
-                          <AlertDialogTitle>
-                            Are you absolutely sure?
-                          </AlertDialogTitle>
-                          <AlertDialogDescription>
-                            This action cannot be undone. This will permanently
-                            delete your board and remove your data from our
-                            servers.
-                          </AlertDialogDescription>
-                        </AlertDialogHeader>
-                        <AlertDialogFooter>
-                          <AlertDialogCancel>Cancel</AlertDialogCancel>
-                          <AlertDialogAction
-                            className="bg-red-500 hover:bg-red-900 text-white"
-                            onClick={boardDeleteHandler}
-                          >
-                            Delete
-                          </AlertDialogAction>
-                        </AlertDialogFooter>
-                      </AlertDialogContent>
-                    </AlertDialog>
-                  </div>
-                </div>
-
-                <Button
-                  className="bg-transparent text-neutral-300 hover:bg-slate-600/30 sm:flex hidden"
-                  onClick={() => router.push("/boards")}
-                >
-                  <span className="min-[783px]:flex hidden">
-                    Return to boards page
-                  </span>{" "}
-                  →
-                </Button>
-              </div>
-              <AlertDialogContent>
-                <AlertDialogHeader>
-                  <AlertDialogTitle>Add new list</AlertDialogTitle>
-                  <AlertDialogDescription>
-                    <form className=" mx-auto" onSubmit={addListHandler}>
-                      <div className="mb-5">
-                        <input
-                          type="text"
-                          name="name"
-                          className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                          placeholder="List name"
-                          onChange={listOnChangeHandler}
-                          required
-                        />
-                      </div>
-
-                      <div className="flex gap-1">
-                        <AlertDialogCancel>Cancel</AlertDialogCancel>
-                        <AlertDialogAction type="submit">
-                          Submit
-                        </AlertDialogAction>
-                      </div>
-                    </form>
-                  </AlertDialogDescription>
-                </AlertDialogHeader>
-              </AlertDialogContent>
-            </AlertDialog>
-            <Toaster richColors closeButton />
-            {listData && listData.length > 0 ? (
-              <div className="flex list-container fixed w-[90vw] sm:w-[75vw] overflow-x-auto">
-                {listData?.map((list: any) => (
-                  <div
-                    className="signature rounded-lg mt-5 min-w-48 p-2 mr-4 flex flex-col"
-                    key={list.id}
-                  >
-                    <div className="w-full flex justify-between items-center">
-                      <EditList
-                        boardId={list.boardId}
-                        listName={list.name}
-                        listId={list.id}
-                        onListEdited={fetchLists}
-                      />
-
-                      <DeleteList listId={list.id} onListDeleted={fetchLists} />
-                    </div>
-
-                    <Card listId={list.id} refresh={refresh} />
-
-                    <AlertDialog>
-                      <div className="flex items-center gap-5 mt-2">
-                        <AlertDialogTrigger
-                          onClick={() =>
-                            setCard({
-                              ...card,
-                              listId: list.id,
-                            })
-                          }
-                          className="bg-transparent w-full text-start text-neutral-300 hover:hover:bg-slate-600/30 px-1 py-[10px] rounded-md text-sm"
-                        >
-                          Add new card +
+                      <AlertDialog>
+                        <AlertDialogTrigger className="text-white px-4 py-[10px] rounded-md text-sm bg-red-500 hover:bg-red-900 flex items-center gap-1">
+                          <span className="min-[900px]:flex hidden">
+                            Delete board
+                          </span>
+                          <Trash2 size={15} />
                         </AlertDialogTrigger>
-                      </div>
-                      <AlertDialogContent>
-                        <AlertDialogHeader>
-                          <AlertDialogTitle>Add new card</AlertDialogTitle>
-                          <AlertDialogDescription>
-                            <form
-                              className=" mx-auto"
-                              onSubmit={addCardHandler}
+
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>
+                              Are you absolutely sure?
+                            </AlertDialogTitle>
+                            <AlertDialogDescription>
+                              This action cannot be undone. This will
+                              permanently delete your board and remove your data
+                              from our servers.
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                            <AlertDialogAction
+                              className="bg-red-500 hover:bg-red-900 text-white"
+                              onClick={boardDeleteHandler}
                             >
-                              <div className="mb-5">
-                                <input
-                                  type="text"
-                                  name="name"
-                                  className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                                  placeholder="Card name"
-                                  required
-                                  onChange={cardOnChangeHandler}
-                                />
-                              </div>
-
-                              <div className="mb-5">
-                                <textarea
-                                  name="description"
-                                  className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                                  placeholder="Card description"
-                                  required
-                                  onChange={cardOnChangeHandler}
-                                ></textarea>
-                              </div>
-
-                              <div className="mb-5">
-                                <input
-                                  type="date"
-                                  name="dueDate"
-                                  className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                                  required
-                                  onChange={cardOnChangeHandler}
-                                />
-                              </div>
-
-                              <div className="flex gap-1">
-                                <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                <AlertDialogAction type="submit">
-                                  Submit
-                                </AlertDialogAction>
-                              </div>
-                            </form>
-                          </AlertDialogDescription>
-                        </AlertDialogHeader>
-                      </AlertDialogContent>
-                    </AlertDialog>
+                              Delete
+                            </AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
+                    </div>
                   </div>
-                ))}
-              </div>
-            ) : (
-              <p className="mt-3">You currently have no lists</p>
-            )}
-          </div>
-        )}
+
+                  <Button
+                    className="bg-transparent text-neutral-300 hover:bg-slate-600/30 sm:flex hidden"
+                    onClick={() => router.push("/boards")}
+                  >
+                    <span className="min-[783px]:flex hidden">
+                      Return to boards page
+                    </span>{" "}
+                    →
+                  </Button>
+                </div>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>Add new list</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      <form className=" mx-auto" onSubmit={addListHandler}>
+                        <div className="mb-5">
+                          <input
+                            type="text"
+                            name="name"
+                            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                            placeholder="List name"
+                            onChange={listOnChangeHandler}
+                            required
+                          />
+                        </div>
+
+                        <div className="">
+                          <AlertDialogCancel className="mr-2">
+                            Cancel
+                          </AlertDialogCancel>
+                          <AlertDialogAction type="submit">
+                            Submit
+                          </AlertDialogAction>
+                        </div>
+                      </form>
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                </AlertDialogContent>
+              </AlertDialog>
+
+              <Toaster richColors closeButton />
+
+              {listData && listData.length > 0 ? (
+                <div className="flex list-container  fixed w-[90vw] sm:w-[75vw] overflow-x-auto">
+                  {listData.map((list: any, index: number) => (
+                    <Droppable key={list.id} droppableId={list.id}>
+                      {(provided, snapshot) => (
+                        <div
+                          className="list-style rounded-lg mt-5  min-w-48 p-2 mr-4 flex flex-col"
+                          {...provided.droppableProps}
+                          ref={provided.innerRef}
+                        >
+                          <div className="mb-1 w-full flex justify-center">
+                            <GripHorizontal className="text-gray-400 w-4 h-4" />
+                          </div>
+                          <div className="w-full flex justify-between items-center gap-2">
+                            <EditList
+                              boardId={list.boardId}
+                              listName={list.name}
+                              listId={list.id}
+                              onListEdited={fetchLists}
+                            />
+
+                            <DeleteList
+                              listId={list.id}
+                              onListDeleted={fetchLists}
+                            />
+                          </div>
+
+                          <Card
+                            listId={list.id}
+                            refresh={refresh}
+                            index={index}
+                          />
+
+                          {provided.placeholder}
+
+                          <AlertDialog>
+                            <div className="flex items-center gap-5 mt-2">
+                              <AlertDialogTrigger
+                                onClick={() =>
+                                  setCard({
+                                    ...card,
+                                    listId: list.id,
+                                  })
+                                }
+                                className="bg-transparent w-full text-start text-neutral-300 hover:hover:bg-slate-600/30 px-1 py-[10px] rounded-md text-sm"
+                              >
+                                Add new card +
+                              </AlertDialogTrigger>
+                            </div>
+                            <AlertDialogContent>
+                              <AlertDialogHeader>
+                                <AlertDialogTitle>
+                                  Add new card
+                                </AlertDialogTitle>
+                                <AlertDialogDescription>
+                                  <form
+                                    className="mx-auto"
+                                    onSubmit={addCardHandler}
+                                  >
+                                    <div className="mb-5">
+                                      <input
+                                        type="text"
+                                        name="name"
+                                        className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                                        placeholder="Card name"
+                                        required
+                                        onChange={cardOnChangeHandler}
+                                      />
+                                    </div>
+
+                                    <div className="mb-5">
+                                      <textarea
+                                        name="description"
+                                        className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                                        placeholder="Card description"
+                                        required
+                                        onChange={cardOnChangeHandler}
+                                      ></textarea>
+                                    </div>
+
+                                    <div className="mb-5">
+                                      <input
+                                        type="date"
+                                        name="dueDate"
+                                        className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                                        required
+                                        onChange={cardOnChangeHandler}
+                                      />
+                                    </div>
+
+                                    <div className="">
+                                      <AlertDialogCancel className="mr-2">
+                                        Cancel
+                                      </AlertDialogCancel>
+                                      <AlertDialogAction type="submit">
+                                        Submit
+                                      </AlertDialogAction>
+                                    </div>
+                                  </form>
+                                </AlertDialogDescription>
+                              </AlertDialogHeader>
+                            </AlertDialogContent>
+                          </AlertDialog>
+                        </div>
+                      )}
+                    </Droppable>
+                  ))}
+                </div>
+              ) : (
+                <p className="mt-3">You currently have no lists</p>
+              )}
+            </div>
+          )}
+        </div>
       </div>
-    </div>
+    </DragDropContext>
   );
 }

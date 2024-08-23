@@ -14,14 +14,15 @@ import {
   getDocs,
   deleteDoc,
 } from "firebase/firestore";
-import { Ellipsis } from "lucide-react";
+import { Draggable } from "@hello-pangea/dnd";
 
 interface CardProps {
   listId: string;
   refresh: boolean;
+  index: number;
 }
 
-export default function Card({ listId, refresh }: CardProps) {
+export default function Card({ listId, refresh, index }: CardProps) {
   const db = getFirestore(app);
 
   const [cardsData, setCardsData] = useState<any | null>(null);
@@ -51,17 +52,29 @@ export default function Card({ listId, refresh }: CardProps) {
   return (
     <div>
       {cardsData && cardsData.length > 0 ? (
-        cardsData.map((card: any) => (
-          <div key={card.id}>
-            <EditCard
-              listId={listId}
-              cardId={card.id}
-              cardName={card.name}
-              cardDesc={card.description}
-              cardDueDate={card.dueDate}
-              onCardEdited={fetchCards}
-            />
-          </div>
+        cardsData.map((card: any, index: number) => (
+          <Draggable key={card.id} draggableId={card.id} index={index}>
+            {(provided, snapshot) => (
+              <div
+                ref={provided.innerRef}
+                {...provided.draggableProps}
+                {...provided.dragHandleProps}
+                className={`flex !left-auto !top-auto justify-between items-center w-full text-start bg-blue-500 py-2 px-3 mt-2 rounded-md ${
+                  snapshot.isDragging ? "bg-blue-500/50" : ""
+                }`}
+              >
+                {card.name}
+                <EditCard
+                  listId={listId}
+                  cardId={card.id}
+                  cardName={card.name}
+                  cardDesc={card.description}
+                  cardDueDate={card.dueDate}
+                  onCardEdited={fetchCards}
+                />
+              </div>
+            )}
+          </Draggable>
         ))
       ) : (
         <></>

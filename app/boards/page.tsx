@@ -32,7 +32,7 @@ export default function Boards() {
   const db = getFirestore(app);
   const [board, setBoard] = useState({
     name: "",
-    color: "",
+    color: "bg-white",
   });
   const [boardsData, setBoardsData]: Array<any> = useState();
   const auth = getAuth(app);
@@ -85,7 +85,7 @@ export default function Boards() {
             id: doc.id,
             ...doc.data(),
           })) as any[];
-          console.log(boardList);
+
           setBoardsData(boardList);
         }
       );
@@ -129,7 +129,12 @@ export default function Boards() {
                     onChange={boardOnChangeHandler}
                     className="mt-3 bg-gray-50 border border-gray-300  text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                   >
-                    <option selected disabled className="text-gray-500">
+                    <option
+                      selected
+                      disabled
+                      value="bg-white"
+                      className="text-gray-500"
+                    >
                       Select a color
                     </option>
                     <option value="bg-red-500">Red</option>

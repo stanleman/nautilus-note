@@ -23,9 +23,10 @@ import {
   AlertDialogCancel,
   AlertDialogAction,
 } from "@/components/ui/alert-dialog";
-import { EllipsisVertical, Captions, AlignLeft, Album } from "lucide-react";
+import { Pencil, PencilLine, AlignLeft, Album } from "lucide-react";
 import { Toaster, toast } from "sonner";
 import DeleteCard from "./deleteCard";
+import { Draggable } from "react-beautiful-dnd";
 
 interface EditCardProps {
   listId: string;
@@ -75,7 +76,7 @@ export default function EditCard({
     onCardEdited();
   };
   return (
-    <>
+    <div>
       <AlertDialog>
         <AlertDialogTrigger
           onClick={() =>
@@ -84,28 +85,27 @@ export default function EditCard({
               listId: listId,
             })
           }
-          className="flex justify-between items-center w-full text-start bg-blue-500 py-2 px-3 mt-2 rounded-md"
+          className="flex-shrink-0"
         >
-          <p>{cardName}</p>
-          <AlignLeft className="w-5 h-5 flex-shrink-0" />
+          <Pencil className="w-4 h-4 cursor-pointer mt-1" />
         </AlertDialogTrigger>
 
+        <AlertDialogTitle></AlertDialogTitle>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogDescription>
-              <form className=" mx-auto" onSubmit={editCardHandler}>
+              <form className="mx-auto" onSubmit={editCardHandler}>
                 <div className="mb-3 flex items-center gap-1">
                   <Album />
                   <input
                     type="text"
                     name="name"
-                    className="text-xl font-bold rounded-lg block w-full p-2.5 dark:bg-transparent dark:border-gray-600 dark:placeholder-gray-400 dark:text-white "
+                    className="text-xl font-bold rounded-lg block w-full p-2.5 dark:bg-transparent dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
                     required
                     value={card.name}
                     onChange={cardOnChangeHandler}
                   />
                 </div>
-
                 <div className="mb-3">
                   <p className="mb-2">Description</p>
                   <textarea
@@ -117,7 +117,6 @@ export default function EditCard({
                     onChange={cardOnChangeHandler}
                   ></textarea>
                 </div>
-
                 <div className="mb-5">
                   <p className="mb-2">Due date</p>
                   <input
@@ -129,13 +128,13 @@ export default function EditCard({
                     onChange={cardOnChangeHandler}
                   />
                 </div>
-
                 <div className="flex justify-between items-center">
-                  <div className="flex gap-1">
-                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                  <div className="">
+                    <AlertDialogCancel className="mr-2">
+                      Cancel
+                    </AlertDialogCancel>
                     <AlertDialogAction type="submit">Submit</AlertDialogAction>
                   </div>
-
                   <DeleteCard cardId={cardId} onCardDeleted={onCardEdited} />
                 </div>
               </form>
@@ -143,6 +142,6 @@ export default function EditCard({
           </AlertDialogHeader>
         </AlertDialogContent>
       </AlertDialog>
-    </>
+    </div>
   );
 }

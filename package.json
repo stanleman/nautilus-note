@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@hello-pangea/dnd": "^16.6.0",
     "@hookform/resolvers": "^3.9.0",
     "@nextui-org/date-picker": "^2.1.6",
     "@nextui-org/spinner": "^2.0.33",
