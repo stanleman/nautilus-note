@@ -11,6 +11,9 @@ import {
   getDocs,
   deleteDoc,
   setDoc,
+  updateDoc,
+  orderBy,
+  onSnapshot,
 } from "firebase/firestore";
 import {
   AlertDialog,
@@ -34,6 +37,7 @@ interface EditCardProps {
   cardName: string;
   cardDesc: string;
   cardDueDate: string;
+  index: number;
   onCardEdited: () => void;
 }
 
@@ -43,6 +47,7 @@ export default function EditCard({
   cardName,
   cardDesc,
   cardDueDate,
+  index,
   onCardEdited,
 }: EditCardProps) {
   const db = getFirestore(app);
@@ -64,17 +69,34 @@ export default function EditCard({
   const editCardHandler = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    await setDoc(doc(db, "cards", cardId), {
-      name: card.name,
-      description: card.description,
-      listId: card.listId,
-      dueDate: card.dueDate,
-      updatedAt: new Date(),
-    });
+    // Fetch the list document directly
+    const listRef = doc(db, "lists", listId);
+    const listDoc = await getDoc(listRef);
 
-    toast.success("Card edited successfully");
-    onCardEdited();
+    if (listDoc.exists()) {
+      const listData = listDoc.data();
+      const updatedCards = listData.cards.map((c: any) =>
+        c.id === cardId
+          ? {
+              ...c,
+              name: card.name,
+              description: card.description,
+              dueDate: card.dueDate,
+            }
+          : c
+      );
+
+      // Update the Firestore document
+      await updateDoc(listRef, { cards: updatedCards });
+
+      // Notify the user
+      toast.success("Card edited successfully");
+      onCardEdited();
+    } else {
+      console.error("List document does not exist");
+    }
   };
+
   return (
     <div>
       <AlertDialog>
@@ -112,7 +134,6 @@ export default function EditCard({
                     name="description"
                     className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                     placeholder="Card description"
-                    required
                     value={card.description}
                     onChange={cardOnChangeHandler}
                   ></textarea>
@@ -123,7 +144,6 @@ export default function EditCard({
                     type="date"
                     name="dueDate"
                     className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                    required
                     value={card.dueDate}
                     onChange={cardOnChangeHandler}
                   />
@@ -135,7 +155,11 @@ export default function EditCard({
                     </AlertDialogCancel>
                     <AlertDialogAction type="submit">Submit</AlertDialogAction>
                   </div>
-                  <DeleteCard cardId={cardId} onCardDeleted={onCardEdited} />
+                  <DeleteCard
+                    cardId={cardId}
+                    listId={listId}
+                    onCardDeleted={onCardEdited}
+                  />
                 </div>
               </form>
             </AlertDialogDescription>

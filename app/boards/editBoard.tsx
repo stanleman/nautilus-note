@@ -21,6 +21,7 @@ export default function EditBoard({
   const db = getFirestore(app);
   const [board, setBoard] = useState({
     name: boardName,
+    color: boardColor,
     userId: "",
   });
 
@@ -40,18 +41,25 @@ export default function EditBoard({
     });
   };
 
+  const colorOnChangeHandler = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setBoard({
+      ...board,
+      [e.target.name]: e.target.value,
+    });
+  };
+
   const editBoardHandler = async () => {
     await setDoc(doc(db, "boards", boardId), {
       name: board.name,
       userId: userId,
-      color: boardColor,
+      color: board.color,
       updatedAt: new Date(),
     });
     onBoardEdited();
   };
 
   return (
-    <div>
+    <div className="flex items-center gap-3">
       <span
         ref={spanRef}
         className="invisible absolute whitespace-pre"
@@ -69,6 +77,23 @@ export default function EditBoard({
         onBlur={editBoardHandler}
         style={{ width: "auto" }}
       />
+
+      <select
+        onChange={colorOnChangeHandler}
+        onBlur={editBoardHandler}
+        name="color"
+        className=" bg-gray-50 border border-gray-300  text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+      >
+        <option selected disabled value={board.color} className="!text-white">
+          Edit board color
+        </option>
+        <option value="bg-red-500">Red</option>
+        <option value="bg-blue-500">Blue</option>
+        <option value="bg-green-500">Green</option>
+        <option value="bg-orange-500">Orange</option>
+        <option value="bg-yellow-500">Yellow</option>
+        <option value="bg-purple-500">Purple</option>
+      </select>
     </div>
   );
 }

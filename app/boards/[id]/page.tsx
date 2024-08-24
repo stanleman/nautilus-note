@@ -15,6 +15,11 @@ import {
   where,
   getDocs,
   deleteDoc,
+  documentId,
+  setDoc,
+  orderBy,
+  updateDoc,
+  arrayUnion,
 } from "firebase/firestore";
 import {
   AlertDialog,
@@ -35,6 +40,7 @@ import EditList from "./editList";
 import EditBoard from "../editBoard";
 import DeleteList from "./deleteList";
 import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
+import { v4 as uuidv4 } from "uuid";
 
 export default function BoardItem({ params }: { params: { id: string } }) {
   const router = useRouter();
@@ -53,6 +59,7 @@ export default function BoardItem({ params }: { params: { id: string } }) {
   const [listDataError, setListDataError] = useState<string | null>(null);
 
   const [refresh, setRefresh] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const [card, setCard] = useState({
     name: "",
@@ -101,7 +108,11 @@ export default function BoardItem({ params }: { params: { id: string } }) {
     if (boardsData) {
       const listsRef = collection(db, "lists");
 
-      const q = query(listsRef, where("boardId", "==", params.id));
+      const q = query(
+        listsRef,
+        where("boardId", "==", params.id),
+        orderBy("createdAt", "asc")
+      );
 
       getDocs(q)
         .then((querySnapshot) => {
@@ -160,8 +171,9 @@ export default function BoardItem({ params }: { params: { id: string } }) {
 
     await addDoc(collection(db, "lists"), {
       name: list.name,
-      createdAt: new Date(),
+      createdAt: new Date().toLocaleTimeString(),
       boardId: params.id,
+      cards: [],
     });
 
     setList({ name: "" });
@@ -214,12 +226,17 @@ export default function BoardItem({ params }: { params: { id: string } }) {
   const addCardHandler = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    await addDoc(collection(db, "cards"), {
+    const newCard = {
+      id: uuidv4(), // Generate a unique ID for the card
       name: card.name,
       description: card.description,
-      listId: card.listId,
       dueDate: card.dueDate,
       createdAt: new Date(),
+    };
+
+    const listDocRef = doc(db, "lists", card.listId);
+    await updateDoc(listDocRef, {
+      cards: arrayUnion(newCard),
     });
 
     setCard({
@@ -234,19 +251,106 @@ export default function BoardItem({ params }: { params: { id: string } }) {
     toast.success("Card added successfully");
   };
 
-  const onDragEnd = (result: any) => {
-    console.log(result);
+  const onDragEnd = async (result: any) => {
+    const { destination, source, draggableId } = result;
 
-    // get card info
-    // set new listId of said card following the destination draggableId
-    // profit
+    if (!destination) {
+      return;
+    }
 
-    // figure out how to store the index
+    setIsLoading(true);
+
+    const sourceList = listData.find(
+      (list: any) => list.id === source.droppableId
+    );
+    const destinationList = listData.find(
+      (list: any) => list.id === destination.droppableId
+    );
+
+    if (!sourceList || !destinationList) {
+      console.error("Source or destination list not found");
+      setIsLoading(false);
+      return;
+    }
+
+    const validateList = (list: any) => {
+      return list && Array.isArray(list.cards);
+    };
+
+    if (!validateList(sourceList) || !validateList(destinationList)) {
+      console.error("Invalid list or cards array");
+      setIsLoading(false);
+      return;
+    }
+
+    try {
+      if (source.droppableId === destination.droppableId) {
+        console.log("Moving within same list");
+        const updatedCards = Array.from(sourceList.cards);
+        const [movedCard] = updatedCards.splice(source.index, 1);
+        updatedCards.splice(destination.index, 0, movedCard);
+
+        const listRef = doc(db, "lists", source.droppableId);
+        await updateDoc(listRef, { cards: updatedCards });
+
+        updateListsState(
+          { ...sourceList, cards: updatedCards },
+          destinationList
+        );
+      } else {
+        console.log("Moving between different lists");
+        const sourceCards = Array.from(sourceList.cards);
+        const [movedCard] = sourceCards.splice(source.index, 1);
+
+        const destinationCards = Array.from(destinationList.cards);
+        destinationCards.splice(destination.index, 0, movedCard);
+
+        const sourceListRef = doc(db, "lists", source.droppableId);
+        const destinationListRef = doc(db, "lists", destination.droppableId);
+
+        await updateDoc(sourceListRef, { cards: sourceCards });
+        await updateDoc(destinationListRef, { cards: destinationCards });
+
+        updateListsState(
+          { ...sourceList, cards: sourceCards },
+          { ...destinationList, cards: destinationCards }
+        );
+      }
+    } catch (error) {
+      console.error("Error updating Firestore:", error);
+      toast.error("Failed to update card positions. Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
   };
+
+  const updateListsState = (
+    updatedSourceList: any,
+    updatedDestinationList: any
+  ) => {
+    setListData((prevState: any) =>
+      prevState.map((list: any) =>
+        list.id === updatedSourceList.id
+          ? { ...list, cards: updatedSourceList.cards }
+          : list.id === updatedDestinationList.id
+          ? { ...list, cards: updatedDestinationList.cards }
+          : list
+      )
+    );
+  };
+
+  if (isLoading) {
+    return (
+      <div className="h-screen w-full absolute flex flex-col bg-[#020817] justify-center items-center !z-[9999]">
+        <h1 className="text-white text-xl font-semibold mb-3">Loading...</h1>
+        <BarLoader color="#90E4C1" />
+      </div>
+    );
+  }
 
   return (
     <DragDropContext onDragEnd={onDragEnd}>
-      <div>
+      <div className="">
         <div className="w-full flex justify-end mt-4 mb-0 sm:hidden ">
           <Button
             className="bg-transparent text-neutral-300 hover:bg-slate-600/30"
@@ -271,17 +375,17 @@ export default function BoardItem({ params }: { params: { id: string } }) {
 
                     <div className="flex gap-2">
                       <AlertDialogTrigger className="bg-[#90E4C1] text-primary-foreground hover:bg-[#90E4C1]/90 px-4 py-[10px] rounded-md text-sm flex">
-                        <span className="min-[900px]:flex hidden">
+                        {/* <span className="min-[900px]:flex hidden">
                           Add new list
-                        </span>
+                        </span> */}
                         +
                       </AlertDialogTrigger>
 
                       <AlertDialog>
                         <AlertDialogTrigger className="text-white px-4 py-[10px] rounded-md text-sm bg-red-500 hover:bg-red-900 flex items-center gap-1">
-                          <span className="min-[900px]:flex hidden">
+                          {/* <span className="min-[900px]:flex hidden">
                             Delete board
-                          </span>
+                          </span> */}
                           <Trash2 size={15} />
                         </AlertDialogTrigger>
 
@@ -353,112 +457,117 @@ export default function BoardItem({ params }: { params: { id: string } }) {
               <Toaster richColors closeButton />
 
               {listData && listData.length > 0 ? (
-                <div className="flex list-container  fixed w-[90vw] sm:w-[75vw] overflow-x-auto">
-                  {listData.map((list: any, index: number) => (
-                    <Droppable key={list.id} droppableId={list.id}>
-                      {(provided, snapshot) => (
-                        <div
-                          className="list-style rounded-lg mt-5  min-w-48 p-2 mr-4 flex flex-col"
-                          {...provided.droppableProps}
-                          ref={provided.innerRef}
-                        >
-                          <div className="mb-1 w-full flex justify-center">
-                            <GripHorizontal className="text-gray-400 w-4 h-4" />
-                          </div>
-                          <div className="w-full flex justify-between items-center gap-2">
-                            <EditList
-                              boardId={list.boardId}
-                              listName={list.name}
-                              listId={list.id}
-                              onListEdited={fetchLists}
-                            />
-
-                            <DeleteList
-                              listId={list.id}
-                              onListDeleted={fetchLists}
-                            />
-                          </div>
-
-                          <Card
-                            listId={list.id}
-                            refresh={refresh}
-                            index={index}
-                          />
-
-                          {provided.placeholder}
-
-                          <AlertDialog>
-                            <div className="flex items-center gap-5 mt-2">
-                              <AlertDialogTrigger
-                                onClick={() =>
-                                  setCard({
-                                    ...card,
-                                    listId: list.id,
-                                  })
-                                }
-                                className="bg-transparent w-full text-start text-neutral-300 hover:hover:bg-slate-600/30 px-1 py-[10px] rounded-md text-sm"
-                              >
-                                Add new card +
-                              </AlertDialogTrigger>
+                <div className="sm:h-[calc(100vh-63px)] h-[calc(100vh-120px)] overflow-x-auto">
+                  <div className="flex list-container  w-[90vw] sm:w-[75vw]  ">
+                    {listData.map((list: any, index: number) => (
+                      <Droppable
+                        key={list.id}
+                        droppableId={list.id}
+                        type="task"
+                      >
+                        {(provided, snapshot) => (
+                          <div
+                            className="list-style rounded-lg mt-5  min-w-48 p-2 mr-4 flex flex-col "
+                            {...provided.droppableProps}
+                            ref={provided.innerRef}
+                          >
+                            <div className="mb-1 w-full flex justify-center">
+                              <GripHorizontal className="text-gray-400 w-4 h-4" />
                             </div>
-                            <AlertDialogContent>
-                              <AlertDialogHeader>
-                                <AlertDialogTitle>
-                                  Add new card
-                                </AlertDialogTitle>
-                                <AlertDialogDescription>
-                                  <form
-                                    className="mx-auto"
-                                    onSubmit={addCardHandler}
-                                  >
-                                    <div className="mb-5">
-                                      <input
-                                        type="text"
-                                        name="name"
-                                        className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                                        placeholder="Card name"
-                                        required
-                                        onChange={cardOnChangeHandler}
-                                      />
-                                    </div>
+                            <div className="w-full flex justify-between items-center gap-2">
+                              <EditList
+                                boardId={list.boardId}
+                                listName={list.name}
+                                listId={list.id}
+                                listCards={list.cards}
+                                listCreatedDate={list.createdAt}
+                                onListEdited={fetchLists}
+                              />
 
-                                    <div className="mb-5">
-                                      <textarea
-                                        name="description"
-                                        className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                                        placeholder="Card description"
-                                        required
-                                        onChange={cardOnChangeHandler}
-                                      ></textarea>
-                                    </div>
+                              <DeleteList
+                                listId={list.id}
+                                onListDeleted={fetchLists}
+                              />
+                            </div>
 
-                                    <div className="mb-5">
-                                      <input
-                                        type="date"
-                                        name="dueDate"
-                                        className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                                        required
-                                        onChange={cardOnChangeHandler}
-                                      />
-                                    </div>
+                            <Card
+                              listId={list.id}
+                              refresh={refresh}
+                              index={index}
+                            />
+                            {provided.placeholder}
 
-                                    <div className="">
-                                      <AlertDialogCancel className="mr-2">
-                                        Cancel
-                                      </AlertDialogCancel>
-                                      <AlertDialogAction type="submit">
-                                        Submit
-                                      </AlertDialogAction>
-                                    </div>
-                                  </form>
-                                </AlertDialogDescription>
-                              </AlertDialogHeader>
-                            </AlertDialogContent>
-                          </AlertDialog>
-                        </div>
-                      )}
-                    </Droppable>
-                  ))}
+                            <AlertDialog>
+                              <div className="flex items-center gap-5 mt-2">
+                                <AlertDialogTrigger
+                                  onClick={() =>
+                                    setCard({
+                                      ...card,
+                                      listId: list.id,
+                                    })
+                                  }
+                                  className="bg-transparent w-full text-start text-neutral-300 hover:hover:bg-slate-600/30 px-1 py-[10px] rounded-md text-sm"
+                                >
+                                  Add new card +
+                                </AlertDialogTrigger>
+                              </div>
+                              <AlertDialogContent>
+                                <AlertDialogHeader>
+                                  <AlertDialogTitle>
+                                    Add new card
+                                  </AlertDialogTitle>
+                                  <AlertDialogDescription>
+                                    <form
+                                      className="mx-auto"
+                                      onSubmit={addCardHandler}
+                                    >
+                                      <div className="mb-5">
+                                        <input
+                                          type="text"
+                                          name="name"
+                                          className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                                          placeholder="Card name"
+                                          required
+                                          onChange={cardOnChangeHandler}
+                                        />
+                                      </div>
+
+                                      <div className="mb-5">
+                                        <textarea
+                                          name="description"
+                                          className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                                          placeholder="Card description"
+                                          onChange={cardOnChangeHandler}
+                                        ></textarea>
+                                      </div>
+
+                                      <div className="mb-5">
+                                        <input
+                                          type="date"
+                                          name="dueDate"
+                                          className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                                          onChange={cardOnChangeHandler}
+                                        />
+                                      </div>
+
+                                      <div className="">
+                                        <AlertDialogCancel className="mr-2">
+                                          Cancel
+                                        </AlertDialogCancel>
+                                        <AlertDialogAction type="submit">
+                                          Submit
+                                        </AlertDialogAction>
+                                      </div>
+                                    </form>
+                                  </AlertDialogDescription>
+                                </AlertDialogHeader>
+                              </AlertDialogContent>
+                            </AlertDialog>
+                          </div>
+                        )}
+                      </Droppable>
+                    ))}
+                  </div>
                 </div>
               ) : (
                 <p className="mt-3">You currently have no lists</p>

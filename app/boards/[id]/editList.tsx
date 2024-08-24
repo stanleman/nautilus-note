@@ -30,6 +30,8 @@ interface EditListProps {
   listId: string;
   boardId: string;
   listName: string;
+  listCards: String[];
+  listCreatedDate: string;
   onListEdited: () => void;
 }
 
@@ -37,6 +39,8 @@ export default function EditList({
   listId,
   boardId,
   listName,
+  listCards,
+  listCreatedDate,
   onListEdited,
 }: EditListProps) {
   const db = getFirestore(app);
@@ -58,7 +62,8 @@ export default function EditList({
     await setDoc(doc(db, "lists", listId), {
       name: list.name,
       boardId: boardId,
-      createdAt: new Date(),
+      cards: listCards,
+      createdAt: listCreatedDate,
     });
 
     // toast.success("List name edited successfully");

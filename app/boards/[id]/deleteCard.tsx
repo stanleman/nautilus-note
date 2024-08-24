@@ -11,6 +11,7 @@ import {
   getDocs,
   deleteDoc,
   setDoc,
+  updateDoc,
 } from "firebase/firestore";
 import {
   AlertDialog,
@@ -28,17 +29,37 @@ import { Button } from "@/components/ui/button";
 
 interface DeleteCardProps {
   cardId: string;
+  listId: string;
   onCardDeleted: () => void;
 }
 
-export default function DeleteCard({ cardId, onCardDeleted }: DeleteCardProps) {
+export default function DeleteCard({
+  cardId,
+  listId,
+  onCardDeleted,
+}: DeleteCardProps) {
   const db = getFirestore(app);
 
   const cardDeleteHandler = async () => {
     try {
-      await deleteDoc(doc(db, "cards", cardId));
-      toast.success("Card deleted successfully");
-      onCardDeleted();
+      const listDocRef = doc(db, "lists", listId);
+      const listDoc = await getDoc(listDocRef);
+
+      if (listDoc.exists()) {
+        const listData = listDoc.data();
+        const updatedCards = listData.cards.filter(
+          (card: any) => card.id !== cardId
+        );
+
+        await updateDoc(listDocRef, {
+          cards: updatedCards,
+        });
+
+        toast.success("Card deleted successfully");
+        onCardDeleted();
+      } else {
+        console.error("List document does not exist");
+      }
     } catch (error) {
       console.error("Error deleting card:", error);
     }

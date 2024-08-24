@@ -13,13 +13,14 @@ import {
   where,
   getDocs,
   deleteDoc,
+  orderBy,
 } from "firebase/firestore";
 import { Draggable } from "@hello-pangea/dnd";
 
 interface CardProps {
   listId: string;
   refresh: boolean;
-  index: number;
+  index: any;
 }
 
 export default function Card({ listId, refresh, index }: CardProps) {
@@ -28,17 +29,12 @@ export default function Card({ listId, refresh, index }: CardProps) {
   const [cardsData, setCardsData] = useState<any | null>(null);
 
   const fetchCards = async () => {
-    const cardsQuery = query(
-      collection(db, "cards"),
-      where("listId", "==", listId)
-    );
+    const listDocRef = doc(db, "lists", listId);
+    const listDoc = await getDoc(listDocRef);
 
-    const querySnapshot = await getDocs(cardsQuery);
-    if (!querySnapshot.empty) {
-      const cards = [] as any[];
-      querySnapshot.forEach((doc) => {
-        cards.push({ id: doc.id, ...doc.data() });
-      });
+    if (listDoc.exists()) {
+      const listData = listDoc.data();
+      const cards = listData?.cards || [];
       setCardsData(cards);
     } else {
       setCardsData([]);
@@ -47,7 +43,7 @@ export default function Card({ listId, refresh, index }: CardProps) {
 
   useEffect(() => {
     fetchCards();
-  }, [listId, refresh]);
+  }, [refresh]);
 
   return (
     <div>
@@ -59,7 +55,7 @@ export default function Card({ listId, refresh, index }: CardProps) {
                 ref={provided.innerRef}
                 {...provided.draggableProps}
                 {...provided.dragHandleProps}
-                className={`flex !left-auto !top-auto justify-between items-center w-full text-start bg-blue-500 py-2 px-3 mt-2 rounded-md ${
+                className={`flex justify-between items-center w-full  text-start bg-blue-500 py-2 px-3 mt-2 rounded-md ${
                   snapshot.isDragging ? "bg-blue-500/50" : ""
                 }`}
               >
@@ -71,13 +67,24 @@ export default function Card({ listId, refresh, index }: CardProps) {
                   cardDesc={card.description}
                   cardDueDate={card.dueDate}
                   onCardEdited={fetchCards}
+                  index={index}
                 />
               </div>
             )}
           </Draggable>
         ))
       ) : (
-        <></>
+        <div>
+          <Draggable draggableId={String(index)} index={index}>
+            {(provided, snapshot) => (
+              <div
+                ref={provided.innerRef}
+                {...provided.draggableProps}
+                {...provided.dragHandleProps}
+              ></div>
+            )}
+          </Draggable>
+        </div>
       )}
     </div>
   );
