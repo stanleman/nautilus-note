@@ -252,13 +252,27 @@ export default function BoardItem({ params }: { params: { id: string } }) {
   };
 
   const onDragEnd = async (result: any) => {
-    const { destination, source, draggableId } = result;
+    const { destination, source, draggableId, type } = result;
 
     if (!destination) {
       return;
     }
 
     setIsLoading(true);
+
+    if (type === "list") {
+      const destinationRef = doc(db, "lists", listData[destination.index].id);
+      const sourceRef = doc(db, "lists", listData[source.index].id);
+      await updateDoc(destinationRef, {
+        createdAt: listData[source.index].createdAt,
+      });
+      await updateDoc(sourceRef, {
+        createdAt: listData[destination.index].createdAt,
+      });
+      fetchLists();
+      setIsLoading(false);
+      return;
+    }
 
     const sourceList = listData.find(
       (list: any) => list.id === source.droppableId
@@ -456,122 +470,158 @@ export default function BoardItem({ params }: { params: { id: string } }) {
 
               <Toaster richColors closeButton />
 
-              {listData && listData.length > 0 ? (
-                <div className="sm:h-[calc(100vh-63px)] h-[calc(100vh-120px)] overflow-x-auto">
-                  <div className="flex list-container  w-[90vw] sm:w-[75vw]  ">
-                    {listData.map((list: any, index: number) => (
-                      <Droppable
-                        key={list.id}
-                        droppableId={list.id}
-                        type="task"
-                      >
-                        {(provided, snapshot) => (
-                          <div
-                            className="list-style rounded-lg mt-5  min-w-48 p-2 mr-4 flex flex-col "
-                            {...provided.droppableProps}
-                            ref={provided.innerRef}
+              <Droppable droppableId="lists" type="list" direction="horizontal">
+                {(provided, snapshot) => (
+                  <div
+                    className="sm:h-[calc(100vh-63px)] h-[calc(100vh-120px)] overflow-x-auto"
+                    ref={provided.innerRef}
+                    {...provided.droppableProps}
+                  >
+                    <div className="flex list-container w-[90vw] sm:w-[75vw]">
+                      {listData && listData.length > 0 ? (
+                        listData.map((list: any, index: any) => (
+                          <Draggable
+                            key={list.id}
+                            draggableId={list.id}
+                            index={index}
                           >
-                            <div className="mb-1 w-full flex justify-center">
-                              <GripHorizontal className="text-gray-400 w-4 h-4" />
-                            </div>
-                            <div className="w-full flex justify-between items-center gap-2">
-                              <EditList
-                                boardId={list.boardId}
-                                listName={list.name}
-                                listId={list.id}
-                                listCards={list.cards}
-                                listCreatedDate={list.createdAt}
-                                onListEdited={fetchLists}
-                              />
-
-                              <DeleteList
-                                listId={list.id}
-                                onListDeleted={fetchLists}
-                              />
-                            </div>
-
-                            <Card
-                              listId={list.id}
-                              refresh={refresh}
-                              index={index}
-                            />
-                            {provided.placeholder}
-
-                            <AlertDialog>
-                              <div className="flex items-center gap-5 mt-2">
-                                <AlertDialogTrigger
-                                  onClick={() =>
-                                    setCard({
-                                      ...card,
-                                      listId: list.id,
-                                    })
-                                  }
-                                  className="bg-transparent w-full text-start text-neutral-300 hover:hover:bg-slate-600/30 px-1 py-[10px] rounded-md text-sm"
+                            {(provided, snapshot) => (
+                              <div
+                                className="list-style rounded-lg mt-5 min-w-48 p-2 mr-4 flex flex-col"
+                                ref={provided.innerRef}
+                                {...provided.draggableProps}
+                                style={{
+                                  ...provided.draggableProps.style,
+                                  ...(snapshot.isDragging
+                                    ? {
+                                        boxShadow:
+                                          "0 0 0 1px rgba(0, 0, 0, 0.1)",
+                                      }
+                                    : {}), // Optional: Add styling when dragging
+                                }}
+                              >
+                                <div
+                                  className="mb-1 w-full flex justify-center"
+                                  {...provided.dragHandleProps}
                                 >
-                                  Add new card +
-                                </AlertDialogTrigger>
-                              </div>
-                              <AlertDialogContent>
-                                <AlertDialogHeader>
-                                  <AlertDialogTitle>
-                                    Add new card
-                                  </AlertDialogTitle>
-                                  <AlertDialogDescription>
-                                    <form
-                                      className="mx-auto"
-                                      onSubmit={addCardHandler}
+                                  <GripHorizontal className="text-gray-400 w-4 h-4" />
+                                </div>
+                                <div className="w-full flex justify-between items-center gap-2">
+                                  <EditList
+                                    boardId={list.boardId}
+                                    listName={list.name}
+                                    listId={list.id}
+                                    listCards={list.cards}
+                                    listCreatedDate={list.createdAt}
+                                    onListEdited={fetchLists}
+                                  />
+                                  <DeleteList
+                                    listId={list.id}
+                                    onListDeleted={fetchLists}
+                                  />
+                                </div>
+
+                                <Droppable droppableId={list.id} type="task">
+                                  {(provided, snapshot) => (
+                                    <div
+                                      className="flex flex-col"
+                                      ref={provided.innerRef}
+                                      {...provided.droppableProps}
                                     >
-                                      <div className="mb-5">
-                                        <input
-                                          type="text"
-                                          name="name"
-                                          className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                                          placeholder="Card name"
-                                          required
-                                          onChange={cardOnChangeHandler}
-                                        />
-                                      </div>
+                                      <Card
+                                        listId={list.id}
+                                        refresh={refresh}
+                                        index={index}
+                                      />
+                                      {provided.placeholder}
 
-                                      <div className="mb-5">
-                                        <textarea
-                                          name="description"
-                                          className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                                          placeholder="Card description"
-                                          onChange={cardOnChangeHandler}
-                                        ></textarea>
-                                      </div>
+                                      <AlertDialog>
+                                        <div className="flex items-center gap-5 mt-2">
+                                          <AlertDialogTrigger
+                                            onClick={() =>
+                                              setCard({
+                                                ...card,
+                                                listId: list.id,
+                                              })
+                                            }
+                                            className="bg-transparent w-full text-start text-neutral-300 hover:bg-slate-600/30 px-1 py-[10px] rounded-md text-sm"
+                                          >
+                                            Add new card +
+                                          </AlertDialogTrigger>
+                                        </div>
+                                        <AlertDialogContent>
+                                          <AlertDialogHeader>
+                                            <AlertDialogTitle>
+                                              Add new card
+                                            </AlertDialogTitle>
+                                            <AlertDialogDescription>
+                                              <form
+                                                className="mx-auto"
+                                                onSubmit={addCardHandler}
+                                              >
+                                                <div className="mb-5">
+                                                  <input
+                                                    type="text"
+                                                    name="name"
+                                                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                                                    placeholder="Card name"
+                                                    required
+                                                    onChange={
+                                                      cardOnChangeHandler
+                                                    }
+                                                  />
+                                                </div>
 
-                                      <div className="mb-5">
-                                        <input
-                                          type="date"
-                                          name="dueDate"
-                                          className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                                          onChange={cardOnChangeHandler}
-                                        />
-                                      </div>
+                                                <div className="mb-5">
+                                                  <textarea
+                                                    name="description"
+                                                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                                                    placeholder="Card description"
+                                                    onChange={
+                                                      cardOnChangeHandler
+                                                    }
+                                                  ></textarea>
+                                                </div>
 
-                                      <div className="">
-                                        <AlertDialogCancel className="mr-2">
-                                          Cancel
-                                        </AlertDialogCancel>
-                                        <AlertDialogAction type="submit">
-                                          Submit
-                                        </AlertDialogAction>
-                                      </div>
-                                    </form>
-                                  </AlertDialogDescription>
-                                </AlertDialogHeader>
-                              </AlertDialogContent>
-                            </AlertDialog>
-                          </div>
-                        )}
-                      </Droppable>
-                    ))}
+                                                <div className="mb-5">
+                                                  <input
+                                                    type="date"
+                                                    name="dueDate"
+                                                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                                                    onChange={
+                                                      cardOnChangeHandler
+                                                    }
+                                                  />
+                                                </div>
+
+                                                <div className="">
+                                                  <AlertDialogCancel className="mr-2">
+                                                    Cancel
+                                                  </AlertDialogCancel>
+                                                  <AlertDialogAction type="submit">
+                                                    Submit
+                                                  </AlertDialogAction>
+                                                </div>
+                                              </form>
+                                            </AlertDialogDescription>
+                                          </AlertDialogHeader>
+                                        </AlertDialogContent>
+                                      </AlertDialog>
+                                    </div>
+                                  )}
+                                </Droppable>
+                              </div>
+                            )}
+                          </Draggable>
+                        ))
+                      ) : (
+                        <p className="mt-3">You currently have no lists</p>
+                      )}
+                      {provided.placeholder}
+                    </div>
                   </div>
-                </div>
-              ) : (
-                <p className="mt-3">You currently have no lists</p>
-              )}
+                )}
+              </Droppable>
             </div>
           )}
         </div>
