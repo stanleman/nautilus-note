@@ -21,15 +21,26 @@ import { useState, useEffect } from "react";
 import app from "@/config.js";
 import { getAuth, signOut, User } from "firebase/auth";
 import { useRouter } from "next/navigation";
+import {
+  collection,
+  DocumentData,
+  getFirestore,
+  onSnapshot,
+  query,
+  QuerySnapshot,
+  where,
+} from "firebase/firestore";
 
 interface SidebarMobileProps {
   sidebarItems: SidebarItems;
 }
 
 export function SidebarMobile(props: SidebarMobileProps) {
+  const db = getFirestore(app);
   const pathname = usePathname();
   const auth = getAuth(app);
   const [user, setUser] = useState<User | null>(null);
+  const [boardsData, setBoardsData]: Array<any> = useState();
   const router = useRouter();
 
   useEffect(() => {
@@ -43,18 +54,31 @@ export function SidebarMobile(props: SidebarMobileProps) {
     return () => userCheck();
   }, [auth]);
 
-  const logOutHandler = async () => {
-    try {
-      await signOut(auth);
-      router.push("/");
-    } catch (error) {
-      if (error instanceof Error) {
-        console.log("Failed to sign in with Google: ", error.message);
-      } else {
-        console.log("Failed to sign in with Google: An unknown error occurred");
-      }
+  const fetchBoards = async () => {
+    if (user) {
+      const boardsRef = collection(db, "boards");
+
+      const q = query(boardsRef, where("userId", "==", user?.uid));
+
+      const unsubscribe = onSnapshot(
+        q,
+        (querySnapshot: QuerySnapshot<DocumentData>) => {
+          const boardList = querySnapshot.docs.map((doc) => ({
+            id: doc.id,
+            ...doc.data(),
+          })) as any[];
+
+          setBoardsData(boardList);
+        }
+      );
+
+      return () => unsubscribe();
     }
   };
+
+  useEffect(() => {
+    fetchBoards();
+  }, [user]);
 
   return (
     <Sheet>
@@ -92,47 +116,25 @@ export function SidebarMobile(props: SidebarMobileProps) {
             ))}
           </div>
 
-          <div className="absolute w-full bottom-4 px-1 left-0 pt-3">
-            <Separator className="absolute -top-3 left-0 w-full" />
-
-            <Drawer>
-              <DrawerTrigger asChild>
-                <Button variant="ghost" className="w-full justify-start">
-                  <div className="flex justify-between items-center w-full">
-                    <div className="flex gap-3 items-center">
-                      <Avatar className="h-9 w-9 ">
-                        <AvatarImage
-                          className="rounded-full"
-                          src={user?.photoURL ?? undefined}
-                        />
-                      </Avatar>
-
-                      <div className="flex flex-col items-start">
-                        <p className="m-0">{user?.displayName}</p>
-                        <p className="text-[9px] text-gray-400 m-0">
-                          {user?.email}
-                        </p>
-                      </div>
-                    </div>
-
-                    <MoreHorizontal size={20} />
-                  </div>
-                </Button>
-              </DrawerTrigger>
-
-              <DrawerContent className="popover-content mb-2 p-2">
-                <div className="flex flex-col mt-2 space-y-2">
-                  <SidebarButton
-                    size="sm"
-                    icon={LogOut}
-                    className="w-full"
-                    onClick={logOutHandler}
+          <div className="px-3">
+            <p className="font-semibold text-white text-lg mt-7">Your boards</p>
+            {!boardsData || boardsData?.length == 0 ? (
+              <p className="mt-2">No boards</p>
+            ) : (
+              <div className="flex flex-col gap-3 mt-2 px-1 overflow-y-auto  h-[375px] ">
+                {boardsData?.map((boardData: any) => (
+                  <div
+                    className="hover:cursor-pointer w-fit"
+                    onClick={() => router.push(`/boards/${boardData.id}`)}
+                    key={boardData.id}
                   >
-                    Log out from {user?.displayName}
-                  </SidebarButton>
-                </div>
-              </DrawerContent>
-            </Drawer>
+                    <p className="text-slate-300 text-sm hover:text-slate-200 hover:scale-105 duration-200">
+                      {boardData.name}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         </div>
       </SheetContent>

@@ -1,6 +1,6 @@
 import app from "@/config.js";
 import { useEffect, useState, useRef } from "react";
-import { getFirestore, doc, setDoc } from "firebase/firestore";
+import { getFirestore, doc, setDoc, getDoc } from "firebase/firestore";
 import { Toaster, toast } from "sonner";
 
 interface EditBoardProps {
@@ -33,6 +33,24 @@ export default function EditBoard({
       inputRef.current.style.width = `${spanRef.current.offsetWidth + 2}px`;
     }
   }, [board.name]);
+
+  const [colors, setColors] = useState<any | null>(null);
+
+  const fetchColors = async () => {
+    const colorsRef = doc(db, "colors", "colors");
+
+    getDoc(colorsRef).then((colorSnap) => {
+      if (colorSnap.exists()) {
+        setColors(colorSnap.data());
+      } else {
+        console.log("color list not found");
+      }
+    });
+  };
+
+  useEffect(() => {
+    fetchColors();
+  }, []);
 
   const boardOnChangeHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
     setBoard({
@@ -87,12 +105,12 @@ export default function EditBoard({
         <option selected disabled value={board.color} className="!text-white">
           Edit board color
         </option>
-        <option value="bg-red-500">Red</option>
-        <option value="bg-blue-500">Blue</option>
-        <option value="bg-green-500">Green</option>
-        <option value="bg-orange-500">Orange</option>
-        <option value="bg-yellow-500">Yellow</option>
-        <option value="bg-purple-500">Purple</option>
+        {colors &&
+          Object.entries(colors).map(([colorName, colorValue]) => (
+            <option key={colorName} value={colorValue as any}>
+              {colorName.charAt(0).toUpperCase() + colorName.slice(1)}
+            </option>
+          ))}
       </select>
     </div>
   );

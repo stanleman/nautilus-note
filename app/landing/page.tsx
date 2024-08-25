@@ -39,17 +39,20 @@ export default function Landing() {
       const userDoc = doc(db, "users", user.uid); // gets by uid
       const userSnapshot = await getDoc(userDoc); // finds by userDoc
 
+      console.log(user);
+
       if (!userSnapshot.exists()) {
         await setDoc(userDoc, {
           id: user.uid,
           email: user.email,
           name: user.displayName,
           photoURL: user.photoURL,
+          isPremium: false,
           createdAt: new Date(),
         });
       }
 
-      router.push("/");
+      router.push("/boards");
     } catch (error) {
       if (error instanceof Error) {
         console.log("Failed to sign in with Google: ", error.message);
@@ -60,7 +63,7 @@ export default function Landing() {
   };
 
   return (
-    <div className=" flex md:flex-row flex-col h-screen bg-gradient-to-r from-[#136a8a] to-[#267871]">
+    <div className=" flex md:flex-row flex-col h-screen bg-gradient-to-r from-[#136a8a] to-[#267871] ">
       <div className="h-full md:w-[50%] w-full flex flex-col justify-center md:items-start items-center md:text-start text-center gap-2 p-[80px]">
         <h1 className="text-xl sm:text-2xl md:text-4xl font-semibold">
           Introducing <span className="font-bold">Nautilus Note</span>

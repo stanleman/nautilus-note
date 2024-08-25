@@ -69,7 +69,6 @@ export default function EditCard({
   const editCardHandler = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    // Fetch the list document directly
     const listRef = doc(db, "lists", listId);
     const listDoc = await getDoc(listRef);
 
@@ -86,16 +85,28 @@ export default function EditCard({
           : c
       );
 
-      // Update the Firestore document
       await updateDoc(listRef, { cards: updatedCards });
 
-      // Notify the user
       toast.success("Card edited successfully");
       onCardEdited();
     } else {
       console.error("List document does not exist");
     }
   };
+
+  const formatDate = (date: any) => {
+    const d = new Date(date);
+    const year = d.getFullYear();
+    let month = "" + (d.getMonth() + 1);
+    let day = "" + d.getDate();
+
+    if (month.length < 2) month = "0" + month;
+    if (day.length < 2) day = "0" + day;
+
+    return [year, month, day].join("-");
+  };
+
+  const today = formatDate(new Date());
 
   return (
     <div>
@@ -142,6 +153,8 @@ export default function EditCard({
                   <p className="mb-2">Due date</p>
                   <input
                     type="date"
+                    min={today}
+                    onKeyDown={(e) => e.preventDefault()}
                     name="dueDate"
                     className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                     value={card.dueDate}

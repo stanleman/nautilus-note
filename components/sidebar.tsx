@@ -1,14 +1,7 @@
 "use client";
 
 import SidebarDesktop from "./sidebar-desktop";
-import {
-  Home,
-  Presentation,
-  Calendar,
-  User,
-  Target,
-  Folder,
-} from "lucide-react";
+import { Home, Presentation, Timer, User, Target, Folder } from "lucide-react";
 import { SidebarItems } from "@/types";
 import { useMediaQuery } from "usehooks-ts";
 import { SidebarMobile } from "./sidebar-mobile";
@@ -21,11 +14,9 @@ import { useRouter } from "next/navigation";
 
 const sidebarItems: SidebarItems = {
   links: [
-    { label: "Home", href: "/", icon: Home },
+    // { label: "Home", href: "/", icon: Home },
     { label: "Boards", href: "/boards", icon: Presentation },
-    { label: "Calendar", href: "/calendar", icon: Calendar },
-    { label: "Focus", href: "/focus", icon: Target },
-    { label: "Resources", href: "/resources", icon: Folder },
+    { label: "Pomodoro", href: "/pomodoro", icon: Timer },
     { label: "Profile", href: "/profile", icon: User },
   ],
 };
@@ -33,7 +24,7 @@ const sidebarItems: SidebarItems = {
 export default function Sidebar() {
   const isDesktop = useMediaQuery("(min-width: 640px", {
     initializeWithValue: false,
-  }); // returns boolean
+  });
 
   const auth = getAuth(app);
   const [user, setUser] = useState<UserType | null>(null);
@@ -55,10 +46,13 @@ export default function Sidebar() {
 
   useEffect(() => {
     if (!loading) {
-      if (user) {
-        router.push("/");
-      } else {
-        console.log("landing");
+      // if (user) {
+      //   router.push("/");
+      // } else {
+      //   console.log("landing");
+      //   router.push("/landing");
+      // }
+      if (!user) {
         router.push("/landing");
       }
     }

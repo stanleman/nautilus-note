@@ -227,7 +227,7 @@ export default function BoardItem({ params }: { params: { id: string } }) {
     e.preventDefault();
 
     const newCard = {
-      id: uuidv4(), // Generate a unique ID for the card
+      id: uuidv4(),
       name: card.name,
       description: card.description,
       dueDate: card.dueDate,
@@ -362,6 +362,20 @@ export default function BoardItem({ params }: { params: { id: string } }) {
     );
   }
 
+  const formatDate = (date: any) => {
+    const d = new Date(date);
+    const year = d.getFullYear();
+    let month = "" + (d.getMonth() + 1);
+    let day = "" + d.getDate();
+
+    if (month.length < 2) month = "0" + month;
+    if (day.length < 2) day = "0" + day;
+
+    return [year, month, day].join("-");
+  };
+
+  const today = formatDate(new Date());
+
   return (
     <DragDropContext onDragEnd={onDragEnd}>
       <div className="">
@@ -389,17 +403,11 @@ export default function BoardItem({ params }: { params: { id: string } }) {
 
                     <div className="flex gap-2">
                       <AlertDialogTrigger className="bg-[#90E4C1] text-primary-foreground hover:bg-[#90E4C1]/90 px-4 py-[10px] rounded-md text-sm flex">
-                        {/* <span className="min-[900px]:flex hidden">
-                          Add new list
-                        </span> */}
                         +
                       </AlertDialogTrigger>
 
                       <AlertDialog>
                         <AlertDialogTrigger className="text-white px-4 py-[10px] rounded-md text-sm bg-red-500 hover:bg-red-900 flex items-center gap-1">
-                          {/* <span className="min-[900px]:flex hidden">
-                            Delete board
-                          </span> */}
                           <Trash2 size={15} />
                         </AlertDialogTrigger>
 
@@ -587,6 +595,10 @@ export default function BoardItem({ params }: { params: { id: string } }) {
                                                   <input
                                                     type="date"
                                                     name="dueDate"
+                                                    min={today}
+                                                    onKeyDown={(e) =>
+                                                      e.preventDefault()
+                                                    }
                                                     className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                                                     onChange={
                                                       cardOnChangeHandler

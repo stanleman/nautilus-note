@@ -11,6 +11,8 @@ import {
   DocumentData,
   query,
   where,
+  getDoc,
+  doc,
 } from "firebase/firestore";
 import {
   AlertDialog,
@@ -37,6 +39,7 @@ export default function Boards() {
   const [boardsData, setBoardsData]: Array<any> = useState();
   const auth = getAuth(app);
   const [user, setUser] = useState<User | null>(null);
+  const [userData, setUserData] = useState<any | null>(null);
   const router = useRouter();
 
   useEffect(() => {
@@ -50,6 +53,27 @@ export default function Boards() {
     return () => userCheck();
   }, [auth]);
 
+  const fetchUsers = async () => {
+    if (user) {
+      console.log(user.uid);
+      const usersRef = doc(db, "users", user?.uid);
+
+      getDoc(usersRef)
+        .then((docSnap) => {
+          if (docSnap.exists()) {
+            setUserData(docSnap.data());
+          }
+        })
+        .catch(() => {
+          console.log("Failed to fetch board data");
+        });
+    }
+  };
+
+  useEffect(() => {
+    fetchUsers();
+  }, [user]);
+
   const boardOnChangeHandler = (e: any) => {
     setBoard({
       ...board,
@@ -60,17 +84,41 @@ export default function Boards() {
   const addBoardHandler = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    await addDoc(collection(db, "boards"), {
-      name: board.name,
-      color: board.color,
-      createdAt: new Date(),
-      userId: user?.uid,
-    });
+    if (boardsData) {
+      if (boardsData.length >= 10 && !userData.isPremium) {
+        toast.error("You have reached your board limit");
+      } else {
+        await addDoc(collection(db, "boards"), {
+          name: board.name,
+          color: board.color,
+          createdAt: new Date(),
+          userId: user?.uid,
+        });
 
-    setBoard({ name: "", color: "" });
+        setBoard({ name: "", color: "bg-white" });
 
-    toast.success("Board added successfully");
+        toast.success("Board added successfully");
+      }
+    }
   };
+
+  const [colors, setColors] = useState<any | null>(null);
+
+  const fetchColors = async () => {
+    const colorsRef = doc(db, "colors", "colors");
+
+    getDoc(colorsRef).then((colorSnap) => {
+      if (colorSnap.exists()) {
+        setColors(colorSnap.data());
+      } else {
+        console.log("color list not found");
+      }
+    });
+  };
+
+  useEffect(() => {
+    fetchColors();
+  }, []);
 
   const fetchBoards = async () => {
     if (user) {
@@ -99,7 +147,7 @@ export default function Boards() {
   }, [user]);
 
   return (
-    <div className="sm:ml-[300px] mx-5 sm:mt-3 mt-16 ">
+    <div className="sm:ml-[300px] mx-5 sm:mt-4 mt-16 ">
       <AlertDialog>
         <div className="flex items-center gap-5">
           <h2 className="font-bold text-2xl">Your Boards </h2>
@@ -137,12 +185,13 @@ export default function Boards() {
                     >
                       Select a color
                     </option>
-                    <option value="bg-red-500">Red</option>
-                    <option value="bg-blue-500">Blue</option>
-                    <option value="bg-green-500">Green</option>
-                    <option value="bg-orange-500">Orange</option>
-                    <option value="bg-yellow-500">Yellow</option>
-                    <option value="bg-purple-500">Purple</option>
+                    {colors &&
+                      Object.entries(colors).map(([colorName, colorValue]) => (
+                        <option key={colorName} value={colorValue as any}>
+                          {colorName.charAt(0).toUpperCase() +
+                            colorName.slice(1)}
+                        </option>
+                      ))}
                   </select>
                 </div>
 

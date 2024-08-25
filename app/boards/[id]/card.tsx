@@ -3,18 +3,7 @@
 import app from "@/config.js";
 import { useEffect, useState } from "react";
 import EditCard from "./editCard";
-import {
-  getFirestore,
-  getDoc,
-  doc,
-  addDoc,
-  collection,
-  query,
-  where,
-  getDocs,
-  deleteDoc,
-  orderBy,
-} from "firebase/firestore";
+import { getFirestore, getDoc, doc } from "firebase/firestore";
 import { Draggable } from "@hello-pangea/dnd";
 
 interface CardProps {
