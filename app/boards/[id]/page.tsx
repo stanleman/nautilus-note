@@ -248,6 +248,8 @@ export default function BoardItem({ params }: { params: { id: string } }) {
 
     setRefresh(!refresh);
 
+    fetchLists();
+
     toast.success("Card added successfully");
   };
 
@@ -277,9 +279,14 @@ export default function BoardItem({ params }: { params: { id: string } }) {
     const sourceList = listData.find(
       (list: any) => list.id === source.droppableId
     );
+
+    console.log(sourceList);
+
     const destinationList = listData.find(
       (list: any) => list.id === destination.droppableId
     );
+
+    console.log(destinationList);
 
     if (!sourceList || !destinationList) {
       console.error("Source or destination list not found");
@@ -313,6 +320,7 @@ export default function BoardItem({ params }: { params: { id: string } }) {
         );
       } else {
         console.log("Moving between different lists");
+        console.log(sourceList);
         const sourceCards = Array.from(sourceList.cards);
         const [movedCard] = sourceCards.splice(source.index, 1);
 
@@ -321,6 +329,9 @@ export default function BoardItem({ params }: { params: { id: string } }) {
 
         const sourceListRef = doc(db, "lists", source.droppableId);
         const destinationListRef = doc(db, "lists", destination.droppableId);
+
+        console.log(sourceCards);
+        console.log(destinationCards);
 
         await updateDoc(sourceListRef, { cards: sourceCards });
         await updateDoc(destinationListRef, { cards: destinationCards });
@@ -332,6 +343,7 @@ export default function BoardItem({ params }: { params: { id: string } }) {
       }
     } catch (error) {
       console.error("Error updating Firestore:", error);
+
       toast.error("Failed to update card positions. Please try again.");
     } finally {
       setIsLoading(false);

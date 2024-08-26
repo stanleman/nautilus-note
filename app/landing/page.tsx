@@ -70,7 +70,7 @@ export default function Landing() {
         </h1>
 
         <p className="text-sm sm:text-md md:text-xl">
-          The number one tool in a student's arsenal to maximise productivity.
+          The number one tool in a students arsenal to maximise productivity.
         </p>
 
         <button

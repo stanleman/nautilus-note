@@ -8,4 +8,6 @@ const Alarm = React.forwardRef((_, ref: any) => {
   );
 });
 
+Alarm.displayName = "Alarm";
+
 export default React.memo(Alarm);
