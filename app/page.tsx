@@ -4,11 +4,17 @@ import { useState, useEffect } from "react";
 import app from "@/config.js";
 import { getAuth, User } from "firebase/auth";
 import { doc, getDoc, getFirestore } from "firebase/firestore";
+import { useRouter } from "next/navigation";
 
 export default function Home() {
   const db = getFirestore(app);
+  const router = useRouter();
   const [user, setUser] = useState<User | null>(null);
   const [userData, setUserData] = useState<any | null>(null);
+
+  useEffect(() => {
+    router.push("/boards");
+  }, []);
 
   useEffect(() => {
     const auth = getAuth(app);

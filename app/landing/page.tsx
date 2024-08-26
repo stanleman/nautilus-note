@@ -36,10 +36,8 @@ export default function Landing() {
       const result = await signInWithPopup(auth, provider);
       const user = result.user;
 
-      const userDoc = doc(db, "users", user.uid); // gets by uid
-      const userSnapshot = await getDoc(userDoc); // finds by userDoc
-
-      console.log(user);
+      const userDoc = doc(db, "users", user.uid);
+      const userSnapshot = await getDoc(userDoc);
 
       if (!userSnapshot.exists()) {
         await setDoc(userDoc, {
