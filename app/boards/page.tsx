@@ -212,7 +212,7 @@ export default function Boards() {
         <div className="flex flex-wrap gap-3 mt-5">
           {boardsData?.map((boardData: any) => (
             <div
-              className={`${boardData.color} w-fit px-[70px] py-[50px] hover:scale-105 hover:cursor-pointer duration-200`}
+              className={`${boardData.color} w-fit px-[70px] py-[50px] rounded-lg hover:scale-105 hover:cursor-pointer duration-200`}
               onClick={() => router.push(`/boards/${boardData.id}`)}
               key={boardData.id}
             >

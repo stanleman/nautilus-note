@@ -66,7 +66,6 @@ function ModalSetting({
             onClick={() => setOpenSetting(false)}
           />
         </div>
-        {/* <div className="h-1 w-full bg-white mt-5 mb-5"></div> */}
         <Separator className="mt-4 mb-4" />
         <div className="flex gap-5">
           {inputs.map((input, index) => {
@@ -84,7 +83,7 @@ function ModalSetting({
           })}
         </div>
         <button
-          className="bg-[#90E4C1] uppercase w-full mt-5 text-white rounded py-2"
+          className="bg-[#90E4C1] uppercase w-full mt-5  rounded text-black py-2"
           onClick={updateTimeDefaultValue}
         >
           Save
