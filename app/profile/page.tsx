@@ -123,7 +123,7 @@ export default function Profile() {
               </Badge>
             </div>
 
-            <div className="w-full grid grid-cols-2 mt-3 gap-5 mb-10">
+            <div className="w-full grid min-[830px]:grid-cols-2 grid-cols-1 mt-3 gap-5 mb-10">
               <div
                 className={`list-style flex flex-col items-center rounded-lg py-5 ${
                   !userData.isPremium ? "!border-2 !border-blue-400" : ""
