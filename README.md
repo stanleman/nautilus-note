@@ -1,4 +1,4 @@
-This is a student productivity app with it's main feature being a Kanban board and also a Pomodoro timer. This project is coded using React, Next JS, Firebase, ShadCN UI, Sonner and hello-pangea-dnd (react-beautiful-dnd).
+This is a student productivity app with it's main feature being a Kanban board and also a Pomodoro timer. This fullstack project is coded using React, Next JS, Firebase, ShadCN UI, Sonner and hello-pangea-dnd (react-beautiful-dnd).
 
 To get started:
 ```
