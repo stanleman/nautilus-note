@@ -1,30 +1,6 @@
 import app from "@/config.js";
 import { useEffect, useState } from "react";
-import {
-  getFirestore,
-  getDoc,
-  doc,
-  addDoc,
-  collection,
-  query,
-  where,
-  getDocs,
-  deleteDoc,
-  setDoc,
-} from "firebase/firestore";
-import {
-  AlertDialog,
-  AlertDialogTrigger,
-  AlertDialogContent,
-  AlertDialogHeader,
-  AlertDialogDescription,
-  AlertDialogTitle,
-  AlertDialogFooter,
-  AlertDialogCancel,
-  AlertDialogAction,
-} from "@/components/ui/alert-dialog";
-import { EllipsisVertical, Captions, AlignLeft, Album } from "lucide-react";
-import { Toaster, toast } from "sonner";
+import { getFirestore, doc, setDoc } from "firebase/firestore";
 
 interface EditListProps {
   listId: string;

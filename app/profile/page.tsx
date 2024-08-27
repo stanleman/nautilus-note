@@ -110,19 +110,6 @@ export default function Profile() {
 
             <div className="flex gap-2 mt-10">
               <h2 className="font-bold text-2xl ">Your Plan</h2>
-              <Badge
-                className={`${
-                  userData.isPremium
-                    ? "bg-[#90E4C1] hover:bg-[#90E4C1]"
-                    : "bg-blue-400 hover:bg-blue-400"
-                }`}
-              >
-                {userData.isPremium ? (
-                  <p>Premium user</p>
-                ) : (
-                  <p>Standard user</p>
-                )}
-              </Badge>
             </div>
 
             <div className="w-full grid min-[830px]:grid-cols-2 grid-cols-1 mt-3 gap-5 mb-10">

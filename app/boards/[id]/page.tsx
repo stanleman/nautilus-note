@@ -517,7 +517,7 @@ export default function BoardItem({ params }: { params: { id: string } }) {
                                         boxShadow:
                                           "0 0 0 1px rgba(0, 0, 0, 0.1)",
                                       }
-                                    : {}), // Optional: Add styling when dragging
+                                    : {}),
                                 }}
                               >
                                 <div
@@ -583,7 +583,7 @@ export default function BoardItem({ params }: { params: { id: string } }) {
                                                   <input
                                                     type="text"
                                                     name="name"
-                                                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                                                    className="text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white"
                                                     placeholder="Card name"
                                                     required
                                                     onChange={
@@ -595,7 +595,7 @@ export default function BoardItem({ params }: { params: { id: string } }) {
                                                 <div className="mb-5">
                                                   <textarea
                                                     name="description"
-                                                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                                                    className="text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white"
                                                     placeholder="Card description"
                                                     onChange={
                                                       cardOnChangeHandler
@@ -611,7 +611,7 @@ export default function BoardItem({ params }: { params: { id: string } }) {
                                                     onKeyDown={(e) =>
                                                       e.preventDefault()
                                                     }
-                                                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                                                    className="text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white"
                                                     onChange={
                                                       cardOnChangeHandler
                                                     }

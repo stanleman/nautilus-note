@@ -107,7 +107,11 @@ export default function EditBoard({
         </option>
         {colors &&
           Object.entries(colors).map(([colorName, colorValue]) => (
-            <option key={colorName} value={colorValue as any}>
+            <option
+              key={colorName}
+              className={`${colorValue}  text-black`}
+              value={colorValue as any}
+            >
               {colorName.charAt(0).toUpperCase() + colorName.slice(1)}
             </option>
           ))}

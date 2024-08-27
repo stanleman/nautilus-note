@@ -30,6 +30,7 @@ import { Toaster, toast } from "sonner";
 import { getAuth, User } from "firebase/auth";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 
 interface EditUserProps {
   userData: any;
@@ -59,7 +60,9 @@ export default function EditUser({
     });
   };
 
-  const onSubmitHandler = async () => {
+  const onSubmitHandler = async (e: any) => {
+    e.preventDefault();
+
     await setDoc(doc(db, "users", id), {
       name: user.name,
       email: user.email,
@@ -71,32 +74,41 @@ export default function EditUser({
 
     onUserEdited();
 
-    router.push("/profile");
+    toast.success("Username successfully edited");
   };
 
   return (
     <div>
-      <div className="mb-3 mt-5">
-        <p className="mb-2">Username</p>
-        <input
-          onChange={onChangeHandler}
-          onBlur={onSubmitHandler}
-          value={user.name}
-          name="name"
-          className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-        />
+      <div className="flex flex-col mt-7">
+        <div className="flex items-center gap-3">
+          <h1 className="text-4xl font-semibold ">{name}</h1>
+          <Badge
+            className={`py-2 h-fit w-fit text-center ${
+              isPremium
+                ? "bg-gradient-to-r from-[#90E4C1] to-blue-300"
+                : "bg-blue-400 hover:bg-blue-400"
+            }`}
+          >
+            {isPremium ? <p>Premium</p> : <p>Standard</p>}
+          </Badge>
+        </div>
+        <p className="text-lg text-gray-400">{email}</p>
       </div>
 
-      <div className="mb-3">
-        <p className="mb-2">Email</p>
-        <input
-          onChange={onChangeHandler}
-          onBlur={onSubmitHandler}
-          value={user.email}
-          name="email"
-          disabled
-          className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-        />
+      <div className="flex flex-col mt-7">
+        <form onSubmit={onSubmitHandler}>
+          <p className="">Edit username</p>
+          <div className="flex items-center gap-2">
+            <input
+              onChange={onChangeHandler}
+              value={user.name}
+              name="name"
+              className="text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white"
+            />
+
+            <Button>Submit changes</Button>
+          </div>
+        </form>
       </div>
     </div>
   );

@@ -166,7 +166,7 @@ export default function Boards() {
                     name="name"
                     value={board.name}
                     onChange={boardOnChangeHandler}
-                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                    className=" text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white "
                     placeholder="Board name"
                     required
                   />
@@ -175,7 +175,7 @@ export default function Boards() {
                     required
                     name="color"
                     onChange={boardOnChangeHandler}
-                    className="mt-3 bg-gray-50 border border-gray-300  text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                    className="mt-3  text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white"
                   >
                     <option
                       selected
@@ -187,7 +187,11 @@ export default function Boards() {
                     </option>
                     {colors &&
                       Object.entries(colors).map(([colorName, colorValue]) => (
-                        <option key={colorName} value={colorValue as any}>
+                        <option
+                          key={colorName}
+                          value={colorValue as any}
+                          className={`${colorValue}  text-black`}
+                        >
                           {colorName.charAt(0).toUpperCase() +
                             colorName.slice(1)}
                         </option>
@@ -212,7 +216,7 @@ export default function Boards() {
         <div className="sm:flex sm:flex-wrap gap-3 mt-5 grid grid-cols-2 max-[400px]:grid-cols-1">
           {boardsData?.map((boardData: any) => (
             <div
-              className={`${boardData.color} sm:w-fit w-full flex justify-center items-center px-[70px] py-[50px] rounded-lg hover:scale-105 hover:cursor-pointer duration-200`}
+              className={`${boardData.color} sm:w-fit w-full text-center flex justify-center items-center px-[70px] py-[50px] rounded-lg hover:scale-105 hover:cursor-pointer duration-200`}
               onClick={() => router.push(`/boards/${boardData.id}`)}
               key={boardData.id}
             >

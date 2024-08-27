@@ -23,7 +23,7 @@ import {
   AlertDialogCancel,
   AlertDialogAction,
 } from "@/components/ui/alert-dialog";
-import { Ellipsis } from "lucide-react";
+import { Ellipsis, Trash, Trash2 } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -69,7 +69,7 @@ export default function DeleteList({ listId, onListDeleted }: DeleteListProps) {
     <div>
       <DropdownMenu>
         <DropdownMenuTrigger>
-          <Ellipsis className="w-4 h-4 text-gray-200" />
+          <Trash2 className="w-4 h-4 text-gray-200 hover:text-red-500 hover:scale-110 duration-200" />
         </DropdownMenuTrigger>
         <DropdownMenuContent>
           <DropdownMenuItem

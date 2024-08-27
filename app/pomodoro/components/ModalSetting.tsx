@@ -29,17 +29,17 @@ function ModalSetting({
     {
       value: "Pomodoro",
       ref: pomodoroRef,
-      defaultValue: pomodoro,
+      defaultValue: 25,
     },
     {
       value: "Short Break",
       ref: shortBreakRef,
-      defaultValue: shortBreak,
+      defaultValue: 5,
     },
     {
       value: "Long Break",
       ref: longBreakRef,
-      defaultValue: longBreak,
+      defaultValue: 15,
     },
   ];
 
