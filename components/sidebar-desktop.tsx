@@ -111,7 +111,7 @@ export default function SidebarDesktop(props: SidebarDesktopProps) {
   }
 
   return (
-    <div className="">
+    <div>
       {userData ? (
         <aside className="w-[270px] max-w-xs h-screen fixed left-0 top-0  border-r">
           <div className="h-full px-3 py-4">
