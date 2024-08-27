@@ -102,10 +102,6 @@ export default function SidebarDesktop(props: SidebarDesktopProps) {
     fetchBoards();
   }, [user]);
 
-  useEffect(() => {
-    console.log(pathname == "/landing");
-  });
-
   if (pathname == "/landing") {
     return <></>;
   }

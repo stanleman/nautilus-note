@@ -209,10 +209,10 @@ export default function Boards() {
       {!boardsData || boardsData?.length == 0 ? (
         <p className="mt-3">You currently have no boards</p>
       ) : (
-        <div className="flex flex-wrap gap-3 mt-5">
+        <div className="sm:flex sm:flex-wrap gap-3 mt-5 grid grid-cols-2 max-[400px]:grid-cols-1">
           {boardsData?.map((boardData: any) => (
             <div
-              className={`${boardData.color} w-fit px-[70px] py-[50px] rounded-lg hover:scale-105 hover:cursor-pointer duration-200`}
+              className={`${boardData.color} sm:w-fit w-full flex justify-center items-center px-[70px] py-[50px] rounded-lg hover:scale-105 hover:cursor-pointer duration-200`}
               onClick={() => router.push(`/boards/${boardData.id}`)}
               key={boardData.id}
             >
