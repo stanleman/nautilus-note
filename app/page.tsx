@@ -57,6 +57,14 @@ export default function Home() {
           <p>
             Hello my name is {userData.name} and my email is {userData.email}
           </p>
+          <div className="w-full flex items-center justify-center gap-4 [&>*]:bg-blue-400">
+            <div className="w-1/2 rounded-xl border border-black flex justify-center items-center">
+              <p>hello world</p>
+            </div>
+            <div className="w-1/2 rounded-xl border border-black flex justify-center items-center">
+              <p>stan said this page was useless now it looks good</p>
+            </div>
+          </div>
           <p>home page</p>
         </div>
       ) : (
