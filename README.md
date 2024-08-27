@@ -1,4 +1,13 @@
-To start the project, run the development server:
+This is a student productivity app with it's main feature being a kanban board and also a pomodoro timer. This project is coded using React, Next JS, Firebase, ShadCN UI, Sonner and hello-pangea-dnd (react-beautiful-dnd).
+
+To get started:
+```
+git clone https://github.com/your-username/your-repo-name.git
+cd your-repo-name
+npm install
+```
+
+To run the project, start the development server:
 
 ```bash
 npm run dev
