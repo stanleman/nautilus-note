@@ -57,6 +57,7 @@ export default function Home() {
           <p>
             Hello my name is {userData.name} and my email is {userData.email}
           </p>
+          <p>home page</p>
         </div>
       ) : (
         <></>
