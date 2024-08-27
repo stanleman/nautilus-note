@@ -2,10 +2,8 @@ This is a student productivity app with it's main feature being a kanban board a
 
 To get started:
 ```
-git clone
-```
- [https://github.com/your-username/your-repo-name.git](https://github.com/stanleman/nautilus-note.git)
-```
+git clone https://github.com/your-username/your-repo-name.git
+
 cd your-repo-name
 npm install
 ```
