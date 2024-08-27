@@ -30,6 +30,12 @@ export default function Landing() {
     return () => userCheck();
   }, []);
 
+  useEffect(() => {
+    if (user) {
+      router.push("/boards");
+    }
+  }, [user]);
+
   const signInWithGoogle = async () => {
     const provider = new GoogleAuthProvider();
     try {
@@ -61,7 +67,7 @@ export default function Landing() {
   };
 
   return (
-    <div className=" flex md:flex-row flex-col h-screen bg-gradient-to-r from-[#136a8a] to-[#267871] ">
+    <div className=" flex md:flex-row flex-col h-screen bg-gradient-to-r from-[#136a8a] to-[#267871] z-50">
       <div className="h-full md:w-[50%] w-full flex flex-col justify-center md:items-start items-center md:text-start text-center gap-2 p-[80px]">
         <h1 className="text-xl sm:text-2xl md:text-4xl font-semibold">
           Introducing <span className="font-bold">Nautilus Note</span>

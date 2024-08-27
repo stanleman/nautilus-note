@@ -78,8 +78,10 @@ export default function Profile() {
 
   const logOutHandler = async () => {
     try {
+      console.log(auth.currentUser);
       await signOut(auth);
-      router.push("/");
+      console.log(auth.currentUser);
+      router.push("/landing");
     } catch (error) {
       if (error instanceof Error) {
         console.log("Failed to sign in with Google: ", error.message);

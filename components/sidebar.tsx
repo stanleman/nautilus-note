@@ -68,13 +68,11 @@ export default function Sidebar() {
     );
   }
 
-  if (user) {
-    if (isDesktop) {
-      return <SidebarDesktop sidebarItems={sidebarItems} />;
-    } else {
-      return <SidebarMobile sidebarItems={sidebarItems} />;
-    }
+  if (isDesktop) {
+    return <SidebarDesktop sidebarItems={sidebarItems} />;
+  } else {
+    return <SidebarMobile sidebarItems={sidebarItems} />;
   }
 
-  return null;
+  // return null;
 }

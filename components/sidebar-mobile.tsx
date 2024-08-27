@@ -80,6 +80,10 @@ export function SidebarMobile(props: SidebarMobileProps) {
     fetchBoards();
   }, [user]);
 
+  if (pathname == "/landing") {
+    return <></>;
+  }
+
   return (
     <Sheet>
       <SheetTrigger asChild>
@@ -88,7 +92,7 @@ export function SidebarMobile(props: SidebarMobileProps) {
         </Button>
       </SheetTrigger>
 
-      <SheetContent className="px-3 py-4" side="left" hideClose>
+      <SheetContent className="px-3 py-4 z-40" side="left" hideClose>
         <SheetHeader className="flex flex-row justify-between items-center space-y-0">
           <span className="mx-3 text-lg font-semibold text-[#90E4C1]">
             Nautilus Note
