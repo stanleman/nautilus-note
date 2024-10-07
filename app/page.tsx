@@ -53,7 +53,7 @@ export default function Home() {
     <div className="flex flex-col sm:ml-[300px] mx-5 sm:mt-4 mt-16">
       {userData ? (
         <div>
-          <h2 className="font-bold text-2xl">Home</h2>
+          {/* <h2 className="font-bold text-2xl">Home</h2>
           <p>
             Hello my name is {userData.name} and my email is {userData.email}
           </p>
@@ -65,7 +65,7 @@ export default function Home() {
               <p>stan said this page was useless now it looks good</p>
             </div>
           </div>
-          <p>home page</p>
+          <p>home page</p> */}
         </div>
       ) : (
         <></>

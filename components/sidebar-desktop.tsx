@@ -108,56 +108,50 @@ export default function SidebarDesktop(props: SidebarDesktopProps) {
 
   return (
     <div>
-      {userData ? (
-        <aside className="w-[270px] max-w-xs h-screen fixed left-0 top-0  border-r">
-          <div className="h-full px-3 py-4">
-            <h3 className="mx-3 text-lg font-semibold text-[#90E4C1]">
-              Nautilus Note
-            </h3>
+      <aside className="w-[270px] max-w-xs h-screen fixed left-0 top-0  border-r">
+        <div className="h-full px-3 py-4">
+          <h3 className="mx-3 text-lg font-semibold text-[#90E4C1]">
+            Nautilus Note
+          </h3>
 
-            <div className="mt-5">
-              <div className="flex flex-col gap-1 w-full">
-                {props.sidebarItems.links.map((link, index) => (
-                  <Link key={index} href={link.href}>
-                    <SidebarButton
-                      variant={pathname === link.href ? "default" : "ghost"}
-                      icon={link.icon}
-                      className="w-full"
-                    >
-                      {link.label}
-                    </SidebarButton>
-                  </Link>
-                ))}
-              </div>
-            </div>
-
-            <div className="px-3">
-              <p className="font-semibold text-white text-lg mt-7">
-                Your boards
-              </p>
-              {!boardsData || boardsData?.length == 0 ? (
-                <p className="mt-2">No boards</p>
-              ) : (
-                <div className="flex flex-col gap-3 mt-2 px-1 overflow-y-auto  h-[450px]">
-                  {boardsData?.map((boardData: any) => (
-                    <div
-                      className="hover:cursor-pointer w-fit"
-                      onClick={() => router.push(`/boards/${boardData.id}`)}
-                      key={boardData.id}
-                    >
-                      <p className="text-slate-300 text-sm hover:text-slate-200 hover:scale-105 duration-200">
-                        {boardData.name}
-                      </p>
-                    </div>
-                  ))}
-                </div>
-              )}
+          <div className="mt-5">
+            <div className="flex flex-col gap-1 w-full">
+              {props.sidebarItems.links.map((link, index) => (
+                <Link key={index} href={link.href}>
+                  <SidebarButton
+                    variant={pathname === link.href ? "default" : "ghost"}
+                    icon={link.icon}
+                    className="w-full"
+                  >
+                    {link.label}
+                  </SidebarButton>
+                </Link>
+              ))}
             </div>
           </div>
-        </aside>
-      ) : (
-        <></>
-      )}
+
+          <div className="px-3">
+            <p className="font-semibold text-white text-lg mt-7">Your boards</p>
+            {!boardsData || boardsData?.length == 0 ? (
+              <p className="mt-2">No boards</p>
+            ) : (
+              <div className="flex flex-col gap-3 mt-2 px-1 overflow-y-auto  h-[450px]">
+                {boardsData?.map((boardData: any) => (
+                  <div
+                    className="hover:cursor-pointer w-fit"
+                    onClick={() => router.push(`/boards/${boardData.id}`)}
+                    key={boardData.id}
+                  >
+                    <p className="text-slate-300 text-sm hover:text-slate-200 hover:scale-105 duration-200">
+                      {boardData.name}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+      </aside>
     </div>
   );
 }
