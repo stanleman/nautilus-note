@@ -16,7 +16,7 @@ const sidebarItems: SidebarItems = {
   links: [
     // { label: "Home", href: "/", icon: Home },
     { label: "Boards", href: "/boards", icon: Presentation },
-    { label: "Pomodoro", href: "/pomodoro", icon: Timer },
+    // { label: "Pomodoro", href: "/pomodoro", icon: Timer },
     { label: "Profile", href: "/profile", icon: User },
   ],
 };
