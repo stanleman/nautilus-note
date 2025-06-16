@@ -109,12 +109,12 @@ export default function SidebarDesktop(props: SidebarDesktopProps) {
   return (
     <div>
       <aside className="w-[270px] max-w-xs h-screen fixed left-0 top-0  border-r">
-        <div className="h-full px-3 py-4">
-          <h3 className="mx-3 text-lg font-semibold text-[#90E4C1]">
+        <div className="h-full px-3 py-6">
+          <h3 className="mx-3 text-2xl font-semibold text-[#90E4C1]">
             Nautilus Note
           </h3>
 
-          <div className="mt-5">
+          {/* <div className="mt-5">
             <div className="flex flex-col gap-1 w-full">
               {props.sidebarItems.links.map((link, index) => (
                 <Link key={index} href={link.href}>
@@ -128,10 +128,10 @@ export default function SidebarDesktop(props: SidebarDesktopProps) {
                 </Link>
               ))}
             </div>
-          </div>
+          </div> */}
 
           <div className="px-3">
-            <p className="font-semibold text-white text-lg mt-7">Your boards</p>
+            <p className="font-bold text-black text-lg mt-7">Your boards</p>
             {!boardsData || boardsData?.length == 0 ? (
               <p className="mt-2">No boards</p>
             ) : (
@@ -142,7 +142,7 @@ export default function SidebarDesktop(props: SidebarDesktopProps) {
                     onClick={() => router.push(`/boards/${boardData.id}`)}
                     key={boardData.id}
                   >
-                    <p className="text-slate-300 text-sm hover:text-slate-200 hover:scale-105 duration-200">
+                    <p className="text-slate-700 text-sm hover:text-slate-800 hover:scale-105 duration-200">
                       {boardData.name}
                     </p>
                   </div>

@@ -32,7 +32,14 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Toaster, toast } from "sonner";
 import BarLoader from "react-spinners/BarLoader";
-import { GripHorizontal, Trash2, Edit2 } from "lucide-react";
+import {
+  GripHorizontal,
+  Trash2,
+  Edit2,
+  ArrowUpDown,
+  Flag,
+  ArrowLeft,
+} from "lucide-react";
 import EditList from "./editList";
 import EditBoard from "../editBoard";
 import DeleteList from "./deleteList";
@@ -41,6 +48,9 @@ import { v4 as uuidv4 } from "uuid";
 import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
 import throttle from "lodash.throttle";
 import React from "react";
+import EditCard from "./editCard";
+import DeleteCard from "./deleteCard";
+// import { Separator } from "@radix-ui/react-separator";
 
 interface Card {
   id: string;
@@ -88,6 +98,7 @@ const MemoizedList = React.memo(
     selectedCard,
     setSelectedCard,
     swapCards,
+    fetchLists,
   }: {
     list: List;
     onMouseDown: (e: React.MouseEvent, listId: string) => void;
@@ -118,6 +129,7 @@ const MemoizedList = React.memo(
       card1: { cardId: string; listId: string },
       card2: { cardId: string; listId: string }
     ) => void;
+    fetchLists: () => void;
   }) => {
     const [showMoveOptions, setShowMoveOptions] = useState<string | null>(null);
 
@@ -183,7 +195,7 @@ const MemoizedList = React.memo(
               {list.cards?.map((cardItem: any, cardIndex: any) => (
                 <div
                   key={cardItem.id}
-                  className={`bg-white rounded !w-[263px] !h-[52px] p-3 shadow-sm border hover:shadow-md transition-shadow relative ${
+                  className={`bg-white rounded p-3 shadow-sm border hover:shadow-md transition-shadow relative ${
                     selectedCard?.cardId === cardItem.id &&
                     selectedCard?.listId === list.id
                       ? "ring-2 ring-blue-500"
@@ -191,70 +203,78 @@ const MemoizedList = React.memo(
                   }`}
                   onClick={() => handleCardClick(cardItem.id)}
                 >
-                  <div className="flex items-center justify-between">
-                    <h4 className="font-medium text-gray-900 mb-1">
-                      {cardItem.name}
-                    </h4>
+                  <div className="flex flex-col">
+                    <div className="flex justify-between items-start mb-1">
+                      <h4 className="font-medium text-gray-900">
+                        {cardItem.name}
+                      </h4>
+                      <div className="flex gap-1">
+                        <button
+                          className="text-gray-500 hover:text-gray-700 p-1 hover:bg-gray-100 rounded transition-colors relative"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setShowMoveOptions(
+                              showMoveOptions === cardItem.id
+                                ? null
+                                : cardItem.id
+                            );
+                          }}
+                        >
+                          <ArrowUpDown size={14} />
+                          {showMoveOptions === cardItem.id && (
+                            <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg z-50">
+                              <div className="py-1">
+                                <div className="px-3 py-1 text-xs text-gray-500">
+                                  Move to:
+                                </div>
+                                {lists
+                                  .filter((l) => l.id !== list.id)
+                                  .map((targetList) => (
+                                    <button
+                                      key={targetList.id}
+                                      className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        moveCardToList(
+                                          cardItem.id,
+                                          list.id,
+                                          targetList.id
+                                        );
+                                        setShowMoveOptions(null);
+                                      }}
+                                    >
+                                      {targetList.name}
+                                    </button>
+                                  ))}
+                              </div>
+                            </div>
+                          )}
+                        </button>
+
+                        <EditCard
+                          listId={list.id}
+                          cardId={cardItem.id}
+                          cardName={cardItem.name}
+                          cardDesc={cardItem.description}
+                          cardDueDate={cardItem.dueDate}
+                          onCardEdited={() => {
+                            fetchLists();
+                          }}
+                        />
+                      </div>
+                    </div>
+
                     {cardItem.description && (
                       <p className="text-sm text-gray-600 mb-2">
                         {cardItem.description}
                       </p>
                     )}
+
                     {cardItem.dueDate && (
-                      <div className="text-xs text-gray-500 mb-2 bg-gray-100 px-2 py-1 rounded">
+                      <div className="text-xs text-gray-500 py-1 rounded flex">
                         Due: {new Date(cardItem.dueDate).toLocaleDateString()}
                       </div>
                     )}
-                    <div className="flex justify-end gap-1">
-                      <button
-                        className="text-gray-500 hover:text-gray-700 p-1 hover:bg-gray-100 rounded transition-colors relative"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setShowMoveOptions(
-                            showMoveOptions === cardItem.id ? null : cardItem.id
-                          );
-                        }}
-                      >
-                        <GripHorizontal size={14} />
-                        {showMoveOptions === cardItem.id && (
-                          <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg z-50">
-                            <div className="py-1">
-                              <div className="px-3 py-1 text-xs text-gray-500">
-                                Move to:
-                              </div>
-                              {lists
-                                .filter((l) => l.id !== list.id)
-                                .map((targetList) => (
-                                  <button
-                                    key={targetList.id}
-                                    className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                                    onClick={(e) => {
-                                      e.stopPropagation();
-                                      moveCardToList(
-                                        cardItem.id,
-                                        list.id,
-                                        targetList.id
-                                      );
-                                      setShowMoveOptions(null);
-                                    }}
-                                  >
-                                    {targetList.name}
-                                  </button>
-                                ))}
-                            </div>
-                          </div>
-                        )}
-                      </button>
-                      <button
-                        className="text-red-500 hover:text-red-700 p-1 hover:bg-red-50 rounded transition-colors"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          deleteCard(cardItem.id, list.id);
-                        }}
-                      >
-                        <Trash2 size={14} />
-                      </button>
-                    </div>
                   </div>
                 </div>
               ))}
@@ -798,19 +818,15 @@ export default function BoardItem({ params }: { params: { id: string } }) {
 
       if (!fromList || !toList) return;
 
-      // Find the card to move
       const cardToMove = fromList.cards.find((card: any) => card.id === cardId);
       if (!cardToMove) return;
 
-      // Remove from source list
       const updatedFromCards = fromList.cards.filter(
         (card: any) => card.id !== cardId
       );
 
-      // Add to target list (at the end)
       const updatedToCards = [...toList.cards, cardToMove];
 
-      // Update state immediately for better UX
       setListData((prev) =>
         prev.map((list) => {
           if (list.id === fromListId) {
@@ -823,7 +839,6 @@ export default function BoardItem({ params }: { params: { id: string } }) {
         })
       );
 
-      // Update Firestore
       const batch = writeBatch(db);
       batch.update(doc(db, "lists", fromListId), {
         cards: updatedFromCards,
@@ -836,7 +851,7 @@ export default function BoardItem({ params }: { params: { id: string } }) {
       toast.success("Card moved successfully");
     } catch (error) {
       console.error("Error moving card:", error);
-      fetchLists(); // Revert on error
+      fetchLists();
       toast.error("Failed to move card");
     }
   };
@@ -851,7 +866,6 @@ export default function BoardItem({ params }: { params: { id: string } }) {
 
       if (!list1 || !list2) return;
 
-      // Find both cards
       const card1Data = list1.cards.find(
         (card: any) => card.id === card1.cardId
       );
@@ -861,12 +875,10 @@ export default function BoardItem({ params }: { params: { id: string } }) {
 
       if (!card1Data || !card2Data) return;
 
-      // Create new card arrays
       let newList1Cards = [...list1.cards];
       let newList2Cards = [...list2.cards];
 
       if (card1.listId === card2.listId) {
-        // Same list - swap positions
         const index1 = newList1Cards.findIndex(
           (card: any) => card.id === card1.cardId
         );
@@ -876,25 +888,21 @@ export default function BoardItem({ params }: { params: { id: string } }) {
 
         if (index1 === -1 || index2 === -1) return;
 
-        // Swap positions
         [newList1Cards[index1], newList1Cards[index2]] = [
           newList1Cards[index2],
           newList1Cards[index1],
         ];
 
-        // Update state
         setListData((prev) =>
           prev.map((list) =>
             list.id === card1.listId ? { ...list, cards: newList1Cards } : list
           )
         );
 
-        // Update Firestore
         await updateDoc(doc(db, "lists", card1.listId), {
           cards: newList1Cards,
         });
       } else {
-        // Different lists - move cards between lists
         newList1Cards = newList1Cards.filter(
           (card: any) => card.id !== card1.cardId
         );
@@ -902,11 +910,9 @@ export default function BoardItem({ params }: { params: { id: string } }) {
           (card: any) => card.id !== card2.cardId
         );
 
-        // Add to opposite lists
         newList1Cards.push(card2Data);
         newList2Cards.push(card1Data);
 
-        // Update state
         setListData((prev) =>
           prev.map((list) => {
             if (list.id === card1.listId) {
@@ -919,7 +925,6 @@ export default function BoardItem({ params }: { params: { id: string } }) {
           })
         );
 
-        // Update Firestore
         const batch = writeBatch(db);
         batch.update(doc(db, "lists", card1.listId), {
           cards: newList1Cards,
@@ -934,7 +939,7 @@ export default function BoardItem({ params }: { params: { id: string } }) {
       toast.success("Cards swapped successfully");
     } catch (error) {
       console.error("Error swapping cards:", error);
-      fetchLists(); // Revert on error
+      fetchLists();
       toast.error("Failed to swap cards");
     }
   };
@@ -981,13 +986,13 @@ export default function BoardItem({ params }: { params: { id: string } }) {
   // console.log(isDraggingCard);
 
   return (
-    <div className="">
-      <div className="w-full flex justify-end mt-4 mb-0 sm:hidden">
+    <div>
+      <div className="w-full flex justify-start mt-4 mb-0 sm:hidden">
         <Button
-          className="bg-transparent text-neutral-300 hover:bg-slate-600/30"
+          className="bg-transparent text-neutral-700 hover:bg-slate-600/10"
           onClick={() => router.push("/boards")}
         >
-          Return to boards page →
+          <ArrowLeft size={20} />
         </Button>
       </div>
       <div className="sm:ml-[300px] mx-5 sm:mt-3 mt-3">
@@ -996,6 +1001,13 @@ export default function BoardItem({ params }: { params: { id: string } }) {
             <AlertDialog>
               <div className="flex items-center justify-between gap-5">
                 <div className="flex gap-4 items-center">
+                  <Button
+                    className="bg-transparent text-neutral-700 hover:bg-slate-600/10 sm:flex hidden"
+                    onClick={() => router.push("/boards")}
+                  >
+                    <ArrowLeft size={20} />
+                  </Button>
+
                   <EditBoard
                     boardId={params.id}
                     userId={user?.uid as string}
@@ -1038,16 +1050,6 @@ export default function BoardItem({ params }: { params: { id: string } }) {
                     </AlertDialog>
                   </div>
                 </div>
-
-                <Button
-                  className="bg-transparent text-neutral-300 hover:bg-slate-600/30 sm:flex hidden"
-                  onClick={() => router.push("/boards")}
-                >
-                  <span className="min-[783px]:flex hidden">
-                    Return to boards page
-                  </span>{" "}
-                  →
-                </Button>
               </div>
               <AlertDialogContent>
                 <AlertDialogHeader>
@@ -1123,19 +1125,18 @@ export default function BoardItem({ params }: { params: { id: string } }) {
                       contentClass="!w-full !h-full relative"
                     >
                       <div
-                        className="absolute bg-gray-50"
+                        className="absolute bg-white"
                         style={{
                           width: `${canvasSize.width}px`,
                           height: `${canvasSize.height}px`,
-                          backgroundSize: "40px 40px",
-                          backgroundImage: `
-                            linear-gradient(to right, #e5e7eb 1px, transparent 1px),
-                            linear-gradient(to bottom, #e5e7eb 1px, transparent 1px)
-                          `,
+                          // backgroundSize: "40px 40px",
+                          // backgroundImage: `
+                          //   linear-gradient(to right, #e5e7eb 1px, transparent 1px),
+                          //   linear-gradient(to bottom, #e5e7eb 1px, transparent 1px)
+                          // `,
                           left: "50%",
                           top: "50%",
                           transform: "translate(-50%, -50%)",
-                          // pointerEvents: isDraggingCard ? "none" : "auto",
                         }}
                       >
                         {listData.map((list) => (
@@ -1156,6 +1157,7 @@ export default function BoardItem({ params }: { params: { id: string } }) {
                             selectedCard={selectedCard}
                             setSelectedCard={setSelectedCard}
                             swapCards={swapCards}
+                            fetchLists={fetchLists}
                           />
                         ))}
                       </div>

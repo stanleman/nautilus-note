@@ -94,7 +94,7 @@ export function SidebarMobile(props: SidebarMobileProps) {
 
       <SheetContent className="px-3 py-4 " side="left" hideClose>
         <SheetHeader className="flex flex-row justify-between items-center space-y-0">
-          <span className="mx-3 text-lg font-semibold text-[#90E4C1]">
+          <span className="mx-3 text-lg font-bold text-[#90E4C1]">
             Nautilus Note
           </span>
 
@@ -106,7 +106,7 @@ export function SidebarMobile(props: SidebarMobileProps) {
         </SheetHeader>
 
         <div className="h-full">
-          <div className="mt-5 flex flex-col w-full gap-1">
+          {/* <div className="mt-5 flex flex-col w-full gap-1">
             {props.sidebarItems.links.map((link, index) => (
               <Link key={index} href={link.href}>
                 <SidebarButton
@@ -118,10 +118,10 @@ export function SidebarMobile(props: SidebarMobileProps) {
                 </SidebarButton>
               </Link>
             ))}
-          </div>
+          </div> */}
 
           <div className="px-3">
-            <p className="font-semibold text-white text-lg mt-7">Your boards</p>
+            <p className="font-semibold text-black text-lg mt-7">Your boards</p>
             {!boardsData || boardsData?.length == 0 ? (
               <p className="mt-2">No boards</p>
             ) : (

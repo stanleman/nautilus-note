@@ -100,7 +100,7 @@ export default function EditBoard({
         onChange={colorOnChangeHandler}
         onBlur={editBoardHandler}
         name="color"
-        className=" border text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white "
+        className=" border text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 text-neutral-800 border-gray-300 placeholder-gray-400  "
       >
         <option selected disabled value={board.color} className="!text-white">
           Edit board color

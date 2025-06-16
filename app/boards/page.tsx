@@ -146,95 +146,109 @@ export default function Boards() {
     fetchBoards();
   }, [user]);
 
+  const colorToGradient: Record<string, string> = {
+    "bg-white": "bg-gradient-to-br from-gray-100 to-gray-300",
+    "bg-green-500": "bg-gradient-to-br from-green-100 to-green-300",
+    "bg-blue-500": "bg-gradient-to-br from-blue-100 to-blue-300",
+    "bg-orange-500": "bg-gradient-to-br from-orange-100 to-orange-300",
+    "bg-pink-500": "bg-gradient-to-br from-pink-200 to-pink-400",
+    "bg-red-500": "bg-gradient-to-br from-pink-300 to-pink-500",
+    "bg-yellow-500": "bg-gradient-to-br from-yellow-200 to-yellow-400",
+    "bg-purple-500": "bg-gradient-to-br from-purple-200 to-purple-400",
+  };
+
   return (
-    <div className="sm:ml-[300px] mx-5 sm:mt-4 mt-16 ">
-      <AlertDialog>
-        <div className="flex items-center gap-5">
-          <h2 className="font-bold text-2xl">Your Boards </h2>
-          <AlertDialogTrigger className="bg-[#90E4C1] text-primary-foreground hover:bg-[#90E4C1]/90 px-4 py-[10px] rounded-md text-sm">
-            Add new board +
-          </AlertDialogTrigger>
-        </div>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Add new board</AlertDialogTitle>
-            <AlertDialogDescription>
-              <form className=" mx-auto" onSubmit={addBoardHandler}>
-                <div className="mb-5">
-                  <input
-                    type="text"
-                    name="name"
-                    value={board.name}
-                    onChange={boardOnChangeHandler}
-                    className=" text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white "
-                    placeholder="Board name"
-                    required
-                  />
+    <div className="sm:ml-[300px] mx-5 sm:mt-4 mt-16 mb-6">
+      {userData ? (
+        <h2 className="font-bold text-3xl mt-20 mb-10">
+          Welcome back, {userData.name}
+        </h2>
+      ) : (
+        <></>
+      )}
 
-                  <select
-                    required
-                    name="color"
-                    onChange={boardOnChangeHandler}
-                    className="mt-3  text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white"
-                  >
-                    <option
-                      selected
-                      disabled
-                      value="bg-white"
-                      className="text-gray-500"
-                    >
-                      Select a color
-                    </option>
-                    {colors &&
-                      Object.entries(colors).map(([colorName, colorValue]) => (
-                        <option
-                          key={colorName}
-                          value={colorValue as any}
-                          className={`${colorValue}  text-black`}
-                        >
-                          {colorName.charAt(0).toUpperCase() +
-                            colorName.slice(1)}
-                        </option>
-                      ))}
-                  </select>
-                </div>
-
-                <div className="flex gap-1">
-                  <AlertDialogCancel>Cancel</AlertDialogCancel>
-                  <AlertDialogAction type="submit">Submit</AlertDialogAction>
-                </div>
-              </form>
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-        </AlertDialogContent>
-      </AlertDialog>
       <Toaster richColors closeButton />
 
-      {!boardsData || boardsData?.length == 0 ? (
-        <p className="mt-3">You currently have no boards</p>
-      ) : (
-        <div className="sm:flex sm:flex-wrap gap-3 mt-5 grid grid-cols-2 max-[400px]:grid-cols-1">
-          {boardsData?.map((boardData: any) => (
-            <div
-              className={`${boardData.color} sm:w-fit w-full text-center flex justify-center items-center px-[70px] py-[50px] rounded-lg hover:scale-105 hover:cursor-pointer duration-200`}
-              onClick={() => router.push(`/boards/${boardData.id}`)}
-              key={boardData.id}
-            >
-              <div>
-                <div className="bg-white"></div>
-                <div className="bg-pink-500"></div>
-                <div className="bg-red-500"></div>
-                <div className="bg-blue-500"></div>
-                <div className="bg-yellow-500"></div>
-                <div className="bg-green-500"></div>
-                <div className="bg-purple-500"></div>
-                <div className="bg-orange-500"></div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 ">
+        <AlertDialog>
+          <AlertDialogTrigger>
+            <div className="rounded-2xl p-6 h-48 text-gray-400 hover:scale-[1.02] transition-transform duration-200 cursor-pointer border-gray-300 border-3 flex items-center justify-center">
+              <div className="text-center">
+                <p className="text-3xl font-bold mb-2">＋</p>
+                <p className="text-lg font-medium">Add a board</p>
               </div>
-              <p className="text-black">{boardData.name}</p>
+            </div>
+          </AlertDialogTrigger>
+
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Add new board</AlertDialogTitle>
+              <AlertDialogDescription>
+                <form className=" mx-auto" onSubmit={addBoardHandler}>
+                  <div className="mb-5">
+                    <input
+                      type="text"
+                      name="name"
+                      value={board.name}
+                      onChange={boardOnChangeHandler}
+                      className=" text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white "
+                      placeholder="Board name"
+                      required
+                    />
+
+                    <select
+                      required
+                      name="color"
+                      onChange={boardOnChangeHandler}
+                      className="mt-3  text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white"
+                    >
+                      <option
+                        selected
+                        disabled
+                        value="bg-white"
+                        className="text-gray-500"
+                      >
+                        Select a color
+                      </option>
+                      {colors &&
+                        Object.entries(colors).map(
+                          ([colorName, colorValue]) => (
+                            <option
+                              key={colorName}
+                              value={colorValue as any}
+                              className={`${colorValue}  text-black`}
+                            >
+                              {colorName.charAt(0).toUpperCase() +
+                                colorName.slice(1)}
+                            </option>
+                          )
+                        )}
+                    </select>
+                  </div>
+
+                  <div className="flex gap-1">
+                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                    <AlertDialogAction type="submit">Submit</AlertDialogAction>
+                  </div>
+                </form>
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+          </AlertDialogContent>
+        </AlertDialog>
+
+        {boardsData &&
+          boardsData.map((boardData: any) => (
+            <div
+              key={boardData.id}
+              className={`rounded-2xl p-6 h-48 text-black shadow-md hover:scale-[1.02] transition-transform duration-200 cursor-pointer ${
+                colorToGradient[boardData.color] || "bg-gray-200"
+              }`}
+              onClick={() => router.push(`/boards/${boardData.id}`)}
+            >
+              <p className="text-xl ">{boardData.name}</p>
             </div>
           ))}
-        </div>
-      )}
+      </div>
     </div>
   );
 }

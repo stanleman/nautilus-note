@@ -1,20 +1,6 @@
 import app from "@/config.js";
-import { useEffect, useState } from "react";
-import {
-  getFirestore,
-  getDoc,
-  doc,
-  addDoc,
-  collection,
-  query,
-  where,
-  getDocs,
-  deleteDoc,
-  setDoc,
-  updateDoc,
-  orderBy,
-  onSnapshot,
-} from "firebase/firestore";
+import { useState } from "react";
+import { getFirestore, doc, getDoc, updateDoc } from "firebase/firestore";
 import {
   AlertDialog,
   AlertDialogTrigger,
@@ -26,10 +12,9 @@ import {
   AlertDialogCancel,
   AlertDialogAction,
 } from "@/components/ui/alert-dialog";
-import { Pencil, PencilLine, AlignLeft, Album } from "lucide-react";
-import { Toaster, toast } from "sonner";
+import { Ellipsis, Pencil } from "lucide-react";
+import { toast } from "sonner";
 import DeleteCard from "./deleteCard";
-import { Draggable } from "react-beautiful-dnd";
 
 interface EditCardProps {
   listId: string;
@@ -37,7 +22,6 @@ interface EditCardProps {
   cardName: string;
   cardDesc: string;
   cardDueDate: string;
-  index: number;
   onCardEdited: () => void;
 }
 
@@ -47,7 +31,6 @@ export default function EditCard({
   cardName,
   cardDesc,
   cardDueDate,
-  index,
   onCardEdited,
 }: EditCardProps) {
   const db = getFirestore(app);
@@ -56,10 +39,11 @@ export default function EditCard({
     name: cardName,
     description: cardDesc,
     dueDate: cardDueDate,
-    listId: "",
   });
 
-  const cardOnChangeHandler = (e: any) => {
+  const cardOnChangeHandler = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
     setCard({
       ...card,
       [e.target.name]: e.target.value,
@@ -69,116 +53,126 @@ export default function EditCard({
   const editCardHandler = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    const listRef = doc(db, "lists", listId);
-    const listDoc = await getDoc(listRef);
+    try {
+      const listRef = doc(db, "lists", listId);
+      const listDoc = await getDoc(listRef);
 
-    if (listDoc.exists()) {
-      const listData = listDoc.data();
-      const updatedCards = listData.cards.map((c: any) =>
-        c.id === cardId
-          ? {
-              ...c,
-              name: card.name,
-              description: card.description,
-              dueDate: card.dueDate,
-            }
-          : c
-      );
+      if (listDoc.exists()) {
+        const listData = listDoc.data();
+        const updatedCards = listData.cards.map((c: any) =>
+          c.id === cardId
+            ? {
+                ...c,
+                name: card.name,
+                description: card.description,
+                dueDate: card.dueDate,
+              }
+            : c
+        );
 
-      await updateDoc(listRef, { cards: updatedCards });
-
-      toast.success("Card edited successfully");
-      onCardEdited();
-    } else {
-      console.error("List document does not exist");
+        await updateDoc(listRef, { cards: updatedCards });
+        toast.success("Card edited successfully");
+        onCardEdited();
+      } else {
+        toast.error("List not found");
+      }
+    } catch (error) {
+      console.error("Error editing card:", error);
+      toast.error("Failed to edit card");
     }
   };
 
-  const formatDate = (date: any) => {
+  const formatDate = (date: string) => {
     const d = new Date(date);
     const year = d.getFullYear();
-    let month = "" + (d.getMonth() + 1);
-    let day = "" + d.getDate();
-
-    if (month.length < 2) month = "0" + month;
-    if (day.length < 2) day = "0" + day;
-
-    return [year, month, day].join("-");
+    const month = String(d.getMonth() + 1).padStart(2, "0");
+    const day = String(d.getDate()).padStart(2, "0");
+    return `${year}-${month}-${day}`;
   };
 
-  const today = formatDate(new Date());
+  const today = formatDate(new Date().toISOString());
 
   return (
-    <div>
-      <AlertDialog>
-        <AlertDialogTrigger
-          onClick={() =>
-            setCard({
-              ...card,
-              listId: listId,
-            })
-          }
-          className="flex-shrink-0"
-        >
-          <Pencil className="w-4 h-4 cursor-pointer mt-1" />
-        </AlertDialogTrigger>
+    <AlertDialog>
+      <AlertDialogTrigger className="flex-shrink-0">
+        <Ellipsis className="text-gray-500 hover:text-gray-700 p-1 hover:bg-gray-100 rounded transition-colors" />
+      </AlertDialogTrigger>
 
-        <AlertDialogTitle></AlertDialogTitle>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogDescription>
-              <form className="mx-auto" onSubmit={editCardHandler}>
-                <div className="mb-3 flex items-center gap-1">
-                  <Album />
-                  <input
-                    type="text"
-                    name="name"
-                    className="text-xl font-bold rounded-lg block w-full p-2.5 bg-transparent border-gray-600 placeholder-gray-400 text-white"
-                    required
-                    value={card.name}
-                    onChange={cardOnChangeHandler}
-                  />
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>Edit Card</AlertDialogTitle>
+          <AlertDialogDescription>
+            <form className="mx-auto" onSubmit={editCardHandler}>
+              <div className="mb-4">
+                <label
+                  htmlFor="name"
+                  className="block text-sm font-medium mb-1"
+                >
+                  Card Name
+                </label>
+                <input
+                  type="text"
+                  id="name"
+                  name="name"
+                  className="w-full p-2 rounded border border-gray-300 "
+                  required
+                  value={card.name}
+                  onChange={cardOnChangeHandler}
+                />
+              </div>
+
+              <div className="mb-4">
+                <label
+                  htmlFor="description"
+                  className="block text-sm font-medium mb-1"
+                >
+                  Description
+                </label>
+                <textarea
+                  id="description"
+                  name="description"
+                  className="w-full p-2 rounded border border-gray-300  min-h-[100px]"
+                  value={card.description}
+                  onChange={cardOnChangeHandler}
+                />
+              </div>
+
+              <div className="mb-6">
+                <label
+                  htmlFor="dueDate"
+                  className="block text-sm font-medium mb-1"
+                >
+                  Due Date
+                </label>
+                <input
+                  type="date"
+                  id="dueDate"
+                  name="dueDate"
+                  min={today}
+                  className="w-full p-2 rounded border border-gray-300 "
+                  value={card.dueDate}
+                  onChange={cardOnChangeHandler}
+                  onKeyDown={(e) => e.preventDefault()}
+                />
+              </div>
+
+              <div className="flex justify-between items-center">
+                <div className="flex gap-2">
+                  <AlertDialogCancel type="button">Cancel</AlertDialogCancel>
+                  <AlertDialogAction type="submit">
+                    Save Changes
+                  </AlertDialogAction>
                 </div>
-                <div className="mb-3">
-                  <p className="mb-2">Description</p>
-                  <textarea
-                    name="description"
-                    className="text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white"
-                    placeholder="Card description"
-                    value={card.description}
-                    onChange={cardOnChangeHandler}
-                  ></textarea>
-                </div>
-                <div className="mb-5">
-                  <p className="mb-2">Due date</p>
-                  <input
-                    type="date"
-                    min={today}
-                    onKeyDown={(e) => e.preventDefault()}
-                    name="dueDate"
-                    className="text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white"
-                    value={card.dueDate}
-                    onChange={cardOnChangeHandler}
-                  />
-                </div>
-                <div className="flex justify-between items-center">
-                  <div className="">
-                    <AlertDialogCancel className="mr-2">
-                      Cancel
-                    </AlertDialogCancel>
-                    <AlertDialogAction type="submit">Submit</AlertDialogAction>
-                  </div>
-                  <DeleteCard
-                    cardId={cardId}
-                    listId={listId}
-                    onCardDeleted={onCardEdited}
-                  />
-                </div>
-              </form>
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-        </AlertDialogContent>
-      </AlertDialog>
-    </div>
+                <DeleteCard
+                  cardId={cardId}
+                  listId={listId}
+                  onCardDeleted={onCardEdited}
+                />
+              </div>
+            </form>
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+      </AlertDialogContent>
+    </AlertDialog>
   );
 }

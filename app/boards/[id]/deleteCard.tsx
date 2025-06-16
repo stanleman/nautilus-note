@@ -26,6 +26,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Toaster, toast } from "sonner";
 import { Button } from "@/components/ui/button";
+import { Trash, Trash2 } from "lucide-react";
 
 interface DeleteCardProps {
   cardId: string;
@@ -68,7 +69,8 @@ export default function DeleteCard({
   return (
     <div>
       <AlertDialog>
-        <AlertDialogTrigger className="bg-transparent text-neutral-300 hover:text-red-500 duration-200">
+        <AlertDialogTrigger className="flex-shrink-0 flex items-center gap-[2px] text-red-500 hover:text-red-700 transition-colors">
+          <Trash2 className="p-1 rounded " />
           Delete card
         </AlertDialogTrigger>
         <AlertDialogContent>
