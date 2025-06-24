@@ -314,7 +314,7 @@ const MemoizedList = React.memo(
                           type="text"
                           name="name"
                           value={card.name}
-                          className="text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white"
+                          className="text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 border border-gray-600 placeholder-gray-400 text-gray-600"
                           placeholder="Card title"
                           required
                           onChange={(e) => {
@@ -330,7 +330,7 @@ const MemoizedList = React.memo(
                         <textarea
                           name="description"
                           value={card.description}
-                          className="text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white"
+                          className="text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 border border-gray-600 placeholder-gray-400 text-gray-600"
                           placeholder="Card description (optional)"
                           rows={3}
                           onChange={(e) => {
@@ -348,7 +348,7 @@ const MemoizedList = React.memo(
                           name="dueDate"
                           value={card.dueDate}
                           min={today}
-                          className="text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white"
+                          className="text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 border border-gray-600 placeholder-gray-400 text-gray-600"
                           onChange={(e) => {
                             e.stopPropagation();
                             cardOnChangeHandler(e);
@@ -1061,7 +1061,7 @@ export default function BoardItem({ params }: { params: { id: string } }) {
                           type="text"
                           name="name"
                           value={list.name}
-                          className="border text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white"
+                          className="border text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 border-gray-600 placeholder-gray-400 text-gray-600"
                           placeholder="List name"
                           onChange={listOnChangeHandler}
                           required

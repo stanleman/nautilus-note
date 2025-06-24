@@ -191,7 +191,7 @@ export default function Boards() {
                       name="name"
                       value={board.name}
                       onChange={boardOnChangeHandler}
-                      className=" text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white "
+                      className=" text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 border border-gray-600 placeholder-gray-400 text-gray-600 "
                       placeholder="Board name"
                       required
                     />
@@ -200,7 +200,7 @@ export default function Boards() {
                       required
                       name="color"
                       onChange={boardOnChangeHandler}
-                      className="mt-3  text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white"
+                      className="mt-3  text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 border border-gray-600 placeholder-gray-400 text-gray-600"
                     >
                       <option
                         selected
